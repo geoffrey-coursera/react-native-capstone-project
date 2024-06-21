@@ -2,26 +2,32 @@ export { LoginProvider, useLogin }
 
 import ErrorBubble from "@/components/ErrorBubble";
 import { P } from "@/components/StyledText";
+import { initState, State, getLoginEntries, saveLogin } from "@/data/login";
 import Colors from "@/lib/Colors";
-import { ReactNode, createContext, useContext, useState } from "react";
+import { loadStateFromGetter, loadStateFromObject } from "@/lib/react";
+import { ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 
-const LoginContext = createContext({
-    firstName: 'John',
-    email: 'john.doe@email.com',
+const init = {
+    ...initState,
+    setIsLoggedIn: (a: boolean) => {},
     isEmailValid: true,
     isFormValid: true,
-    isLoggedIn: true,
-    setFirstName: (_: string) => {},
-    setEmail: (_: string) => {},
+    setFirstName: (a: string) => {},
+    setEmail: (a: string) => {},
     errors: [] as string[],
     emailErrorRenderer: () => null as ReactNode,
     logIn: () => {},
-    clearAll: () => {}
-});
+    clearAll: () => {},
+    isStorageLoaded: false,
+    loadStateFromStorage: () => Promise.resolve()
+};
+
+const LoginContext = createContext({...init, save: () => {}});
 
 const useLogin = () => useContext(LoginContext);
 
 const LoginProvider = ({ children }: { children: ReactNode }) => {
+    const [isStorageLoaded, setIsStorageLoaded] = useState(false);
     const [firstName, setFirstName] = useState('');
     const [email, setEmail] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -38,29 +44,42 @@ const LoginProvider = ({ children }: { children: ReactNode }) => {
     ].filter(Boolean) as string[]
 
     const logIn = () => setIsLoggedIn(isFormValid);
+    useEffect(() => { isLoggedIn && save() }, [isLoggedIn]);
 
-    const clearAll = () => {
-        setFirstName('');
-        setEmail('');
-        setIsLoggedIn(false);
-    };
+    const clearAll = useCallback(() => {
+        loadStateFromObject(context, initState);
+        saveLogin(initState);
+    }, []);
 
-    const value = {
-        firstName,
-        email,
+    const loadStateFromStorage = useCallback(() =>
+        loadStateFromGetter(context, getLoginEntries),
+    []);
+
+    useEffect(() => {
+        loadStateFromStorage().then(() => setIsStorageLoaded(true))
+    }, []);
+
+    const state = { isLoggedIn, firstName, email } satisfies State;
+
+    const context = {
+        ...state,
+        setIsLoggedIn,
         emailErrorRenderer,
         isEmailValid,
         isFormValid,
-        isLoggedIn,
         setFirstName,
         setEmail,
         errors,
         logIn,
-        clearAll
+        clearAll,
+        isStorageLoaded,
+        loadStateFromStorage
     };
+    
+    const save = () => { saveLogin(state); }
 
     return (
-        <LoginContext.Provider value={value}>
+        <LoginContext.Provider value={{...context, save}}>
             {children}
         </LoginContext.Provider>
     );

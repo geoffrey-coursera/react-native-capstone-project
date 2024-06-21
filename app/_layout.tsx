@@ -23,13 +23,7 @@ const Stack = createNativeStackNavigator();
 
 
 const Main = () =>  {
-    const [loaded, error] = useFonts(fonts);
-
-    const show = loaded || error;
-
-    useEffect(() => { show && SplashScreen.hideAsync() }, [loaded]);
-      
-    return show && (
+    return (
         <LoginProvider>
             <ProfileProvider>
                 <SearchModeProvider>
@@ -41,9 +35,14 @@ const Main = () =>  {
 };
 
 const App = () => {
-    const { isLoggedIn }= useLogin();
+    const [loaded, error] = useFonts(fonts);
+    const { isLoggedIn, isStorageLoaded }= useLogin();
 
-    return (
+    const show = (loaded || error) && isStorageLoaded;
+
+    useEffect(() => { show && SplashScreen.hideAsync() }, [loaded]);
+
+    return show && (
         <NavigationContainer independent={true}>
             <SafeAreaView style={{flex: 1}}>
             <Stack.Navigator initialRouteName="Home" screenOptions={{

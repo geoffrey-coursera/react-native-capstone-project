@@ -2,40 +2,30 @@ export { ProfileProvider, useProfile }
 
 import ErrorBubble from "@/components/ErrorBubble";
 import { P } from "@/components/StyledText";
-import { useLogin } from "@/context/Login";
+import { initState, State, getProfileEntries, saveProfile } from "@/data/profile";
 import Colors from "@/lib/Colors";
-import { ReactNode, createContext, useContext, useState } from "react";
+import { loadStateFromObject, loadStateFromGetter } from "@/lib/react";
+import { ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 
-const noop = (..._: any[]) => {}
-
-const ProfileContext = createContext({
-    lastName: '',
-    phoneNumber: '',
-    orderStatus: false,
-    passwordChange: true,
-    specialOffer: false,
-    newsletter: false,
-    image: '',
-    setLastName: noop,
-    setPhoneNumber: noop,
-    setOrderStatus: noop,
-    setPasswordChange: noop,
-    setSpecialOffer: noop,
-    setNewsLetter: noop,
-    setImage: noop,
+const init = {
+    ...initState,
+    setLastName: (a: string) => {},
+    setPhoneNumber: (a: string) => {},
+    setOrderStatus: (a: boolean) => {},
+    setPasswordChange: (a: boolean) => {},
+    setSpecialOffer: (a: boolean) => {},
+    setNewsletter: (a: boolean) => {},
+    setImage: (a: string) => {},
     isPhoneNumberValid: false,
     errors: [] as string[],
     phoneErrorRenderer: () => null as ReactNode,
-    clearAll: noop,
-});
-
-    
-const useProfile = () => {
-    const context = useContext(ProfileContext);
-    const { firstName, setFirstName, email, setEmail } = useLogin();
-    const saveProfile = () => {};
-    return { ...context, firstName, setFirstName, email, setEmail, saveProfile };
+    clearAll: () => {},
+    loadStateFromStorage: () => Promise.resolve()
 };
+
+const ProfileContext = createContext({...init, save: () => {}});
+
+const useProfile = () => useContext(ProfileContext);
     
 const ProfileProvider = ({ children }: { children: ReactNode }) => {
     const [lastName, setLastName] = useState('');
@@ -43,7 +33,7 @@ const ProfileProvider = ({ children }: { children: ReactNode }) => {
     const [orderStatus, setOrderStatus] = useState(true);
     const [passwordChange, setPasswordChange] = useState(true);
     const [specialOffer, setSpecialOffer] = useState(true);
-    const [newsletter, setNewsLetter] = useState(true);
+    const [newsletter, setNewsletter] = useState(true);
     const [image, setImage] = useState('');
     const isPhoneNumberValid = checkPhoneNumber(phoneNumber);
 
@@ -51,30 +41,47 @@ const ProfileProvider = ({ children }: { children: ReactNode }) => {
         !(isPhoneNumberValid || phoneNumber === '') && 'incorrect phone number'
     ].filter(Boolean) as string[];
 
-    const clearAll = () => {
-        setLastName('');
-        setPhoneNumber('');
-        setOrderStatus(true);
-        setPasswordChange(true);
-        setSpecialOffer(true);
-        setNewsLetter(true);
-        setImage('')
+    const clearAll = useCallback(() => {
+        loadStateFromObject(context, initState);
+        saveProfile(initState);
+    }, []);
+
+    const loadStateFromStorage = useCallback(() =>
+        loadStateFromGetter(context, getProfileEntries),
+    []);
+
+    useEffect(() => { loadStateFromStorage() }, []);
+
+    const state = {
+        lastName,
+        phoneNumber,
+        orderStatus,
+        passwordChange,
+        specialOffer,
+        newsletter,
+        image,
+    } satisfies State;
+
+    const context = {
+        ...state,
+        setLastName,
+        setPhoneNumber,
+        isPhoneNumberValid,
+        phoneErrorRenderer,
+        setOrderStatus,
+        setPasswordChange,
+        setSpecialOffer,
+        setNewsletter,
+        setImage,
+        errors,
+        clearAll,
+        loadStateFromStorage
     };
 
-    const value = {
-        lastName, setLastName,
-        phoneNumber, setPhoneNumber, isPhoneNumberValid, phoneErrorRenderer,
-        orderStatus, setOrderStatus,
-        passwordChange, setPasswordChange,
-        specialOffer, setSpecialOffer,
-        newsletter, setNewsLetter,
-        image, setImage,
-        errors,
-        clearAll
-    };
+    const save = () => saveProfile(state);
 
     return (
-        <ProfileContext.Provider value={value}>
+        <ProfileContext.Provider value={{...context, save}}>
             {children}
         </ProfileContext.Provider>
     );

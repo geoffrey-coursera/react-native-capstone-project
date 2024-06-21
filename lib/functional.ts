@@ -1,4 +1,4 @@
-export { effect, rejectIf, isEmpty, runOnce };
+export { effect, rejectIf, isEmpty, runOnce, pick };
 
 /** perform a side-effect while returning the input value unaltered */
 const effect = <T, U>(f: (a: T) => U) => (a: T) => (f(a), a);
@@ -17,4 +17,13 @@ const runOnce = <T>(f: (a: T) => void) => {
         if(!hasRun) { f(a) }
         hasRun = true;
     }
+}
+
+/** return a subset of the input object with the provided keys */
+const pick = <const K extends readonly string[], O extends Record<K[number], any>>(obj: O, keys: K) => {
+    return Object.fromEntries(
+        keys
+        .filter(key => key in obj)
+        .map(key => [key, (obj as Record<string, unknown>)[key]])
+      ) as {[P in K[number]]: O[P] };
 }

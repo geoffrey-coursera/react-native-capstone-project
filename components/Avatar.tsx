@@ -30,7 +30,8 @@ const InitialsAvatar = ({ firstName, lastName, style, size }: AvatarProps) => (
 );
 
 const formatInitials = (firstName?: string, lastName?: string) =>
-    lastName ? (firstName ?? '')[0].toUpperCase() + lastName[0].toUpperCase()
+    !firstName ? ''
+    : lastName ? firstName[0].toUpperCase() + lastName[0].toUpperCase()
     : firstName ? firstName[0].toUpperCase() + firstName.slice(1, 2) || ''
     : '';
 

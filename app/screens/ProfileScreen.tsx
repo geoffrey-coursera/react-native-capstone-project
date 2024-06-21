@@ -1,6 +1,6 @@
 export { ProfileScreen as default };
 
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import MainView from '@/components/MainView';
 import { H4 } from '@/components/StyledText';
 import Avatar from '@/components/Avatar';
@@ -23,6 +23,26 @@ const ProfileScreen = () => {
         login.clearAll();
     }
 
+    const saveAll = () => {
+        $.save();
+        login.save();
+        Alert.alert(
+            'Saved!',
+            'Your changes have been saved'
+        );
+    };
+
+    const discardChanges = () => {
+        Promise.all([
+            $.loadStateFromStorage(),
+            login.loadStateFromStorage()
+        ]).then(() => Alert.alert(
+            'Success',
+            'Your previous settings have been restored'
+        ))
+        
+    };
+
     const errors = [...login.errors, ...$.errors];
     const isFormValid = errors.length === 0;
 
@@ -33,7 +53,7 @@ const ProfileScreen = () => {
         <MainView ref={viewRef} style={styles.screen} scrollable>
             <View>
                 <H4>Avatar</H4>
-                <AvatarPicker firstName={$.firstName} lastName={$.lastName} image={$.image} setImage={$.setImage}/>
+                <AvatarPicker firstName={login.firstName} lastName={$.lastName} image={$.image} setImage={$.setImage}/>
             </View>
             <Spacer />
             <Section>
@@ -42,8 +62,8 @@ const ProfileScreen = () => {
                     <InputField
                         required
                         label="First name"
-                        value={$.firstName}
-                        onChangeText={$.setFirstName}
+                        value={login.firstName}
+                        onChangeText={login.setFirstName}
                         scrollTo={viewRef}
                         scrollOffset={scrollOffset} />
                     <InputField
@@ -59,8 +79,8 @@ const ProfileScreen = () => {
                         keyboardType="email-address"
                         isValid={login.isEmailValid}
                         errorMessage={login.emailErrorRenderer}
-                        value={$.email}
-                        onChangeText={$.setEmail}
+                        value={login.email}
+                        onChangeText={login.setEmail}
                         scrollTo={viewRef}
                         scrollOffset={scrollOffset} />
                     <InputField
@@ -82,7 +102,7 @@ const ProfileScreen = () => {
                     <Checkbox label="Order statuses" checked={$.orderStatus} onToggle={$.setOrderStatus}/>
                     <Checkbox label="Password changes" checked={$.passwordChange} onToggle={$.setPasswordChange}/>
                     <Checkbox label="Special offers" checked={$.specialOffer} onToggle={$.setSpecialOffer}/>
-                    <Checkbox label="Newsletter" checked={$.newsletter} onToggle={$.setNewsLetter}/>
+                    <Checkbox label="Newsletter" checked={$.newsletter} onToggle={$.setNewsletter}/>
                 </FieldSet>
             </Section>
             <Spacer />
@@ -90,11 +110,13 @@ const ProfileScreen = () => {
                 <PrimaryButton
                     disabledReasons={errors}
                     disabled={!isFormValid}
-                    onPress={$.saveProfile}
+                    onPress={saveAll}
                 >
                     Save changes
                 </PrimaryButton>
-                <SecondaryButton style={{flex: 1}} onPress={() => {}}>Discard changes</SecondaryButton>
+                <SecondaryButton style={{flex: 1}} onPress={discardChanges}>
+                    Discard changes
+                </SecondaryButton>
             </Row>
             <Spacer />
             <PrimaryButton onPress={logOut}>Log out</PrimaryButton>

@@ -33,8 +33,8 @@ const Header = ({ back, route }: NativeStackHeaderProps) => {
 };
 
 const HomeHeader = () => {
-    const { isLoggedIn } = useLogin();
-    const { firstName, lastName, image} = useProfile();
+    const { isLoggedIn, firstName } = useLogin();
+    const { lastName, image} = useProfile();
     const { navigate } = useNavigation<NavigationProp<{Profile: any}>>();
 
     return (
