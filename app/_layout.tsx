@@ -16,6 +16,7 @@ import { SearchModeProvider } from '@/context/SearchMode';
 import { LoginProvider, useLogin } from '@/context/Login';
 import { ProfileProvider } from '@/context/Profile';
 import { Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
@@ -44,6 +45,7 @@ const App = () => {
 
     return (
         <NavigationContainer independent={true}>
+            <SafeAreaView style={{flex: 1}}>
             <Stack.Navigator initialRouteName="Home" screenOptions={{
                 // iOS requires a development build to acknowledge UIViewControllerBasedStatusBarAppearance
                 // so I'm dropping it in the context of this assignment.
@@ -52,6 +54,7 @@ const App = () => {
             }}>
                 {isLoggedIn ? MainNavigation() : OnboardingNavigation()}
             </Stack.Navigator>
+            </SafeAreaView>
         </NavigationContainer>
     );
 }
