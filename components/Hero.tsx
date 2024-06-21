@@ -1,12 +1,12 @@
 export { Hero as default };
 
 import { useState } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import HeroImage from '@/assets/images/starters-plate.jpg';
 import Colors from '@/lib/Colors';
 import AutoFitImage from '@/components/AutoFitImage';
 import SearchBar from '@/components/SearchBar';
-import { Title, SubTitle } from '@/components/Text';
+import { Title, SubTitle, Highlight } from '@/components/StyledText';
 
 const Hero = ({ onSearch }: { onSearch: (a: string) => void}) => {
     const [searchBarText, setSearchBarText] = useState('');
@@ -27,10 +27,10 @@ const Hero = ({ onSearch }: { onSearch: (a: string) => void}) => {
                     imageStyle={styles.heroImage}
                 >
                     <SubTitle>Chicago</SubTitle>
-                    <Text style={styles.heroText} >
+                    <Highlight style={styles.heroText} >
                         We are a family owned Mediterranean restaurant,
                         focused on traditional recipes served with a modern twist.
-                    </Text>
+                    </Highlight>
                 </AutoFitImage>
             </View>
             <SearchBar
@@ -54,9 +54,7 @@ const styles = StyleSheet.create({
         borderRadius: 20
     },
     heroText: {
-        fontFamily: 'Karla',
         color: Colors.paper,
-        fontSize: 18,
         marginTop: 10
     }
 })
