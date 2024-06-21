@@ -9,7 +9,8 @@ const LoginContext = createContext({
     isLoggedIn: true,
     setFirstName: (_: string) => {},
     setEmail: (_: string) => {},
-    logIn: () => {}
+    logIn: () => {},
+    clearAll: () => {}
 });
 
 const useLogin = () => useContext(LoginContext);
@@ -21,7 +22,12 @@ const LoginProvider = ({ children }: { children: ReactNode }) => {
     const isFormFilled = Boolean(firstName && email);
     const isEmailValid = checkEmail(email);
     const isFormValid = isFormFilled && isEmailValid;
-    const logIn = () => setIsLoggedIn(true);
+    const logIn = () => setIsLoggedIn(isFormValid);
+    const clearAll = () => {
+        setFirstName('');
+        setEmail('');
+        setIsLoggedIn(false);
+    };
 
     const value = {
         firstName,
@@ -30,8 +36,9 @@ const LoginProvider = ({ children }: { children: ReactNode }) => {
         isLoggedIn,
         setFirstName,
         setEmail,
-        logIn
-    }
+        logIn,
+        clearAll
+    };
 
     return (
         <LoginContext.Provider value={value}>

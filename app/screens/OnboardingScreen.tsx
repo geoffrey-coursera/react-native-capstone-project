@@ -1,13 +1,14 @@
 export { OnboardingScreen as default };
 
-import { View, StyleSheet, TextInput, KeyboardType, Dimensions, Keyboard, Pressable } from 'react-native';
+import { View, StyleSheet, Dimensions, Pressable } from 'react-native';
 import MainView from '@/components/MainView';
 import { H4, Highlight } from '@/components/StyledText';
 import KeyboardAwareView from '@/components/KeyboardAwareView';
 import { Colors, Shades } from '@/lib/Colors';
 
 import { useLogin } from '@/context/Login';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
+import InputField from '@/components/InputField';
 
 // I use a static height to ensure it isn't resized by the keyboard on Android
 const headerHeight = 80;
@@ -56,45 +57,6 @@ const calcSpacing = (screenHeight: number, keyboardHeight: number) =>
     3.5 * (screenHeight - keyboardHeight) ** 3 / 10**7
 
 
-type InputFieldProps = {
-    label: string,
-    value: string,
-    keyboardType?: KeyboardType
-    onChangeText: (a: string) => void
-};
-
-const InputField = ({ label, value, onChangeText, keyboardType='default' }: InputFieldProps) => {
-    const [isFocused, setIsFocused] = useState(false);
-    const inputRef = useRef<TextInput>(null);
-
-    useEffect(() => {
-        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-          if (inputRef.current) {
-            inputRef.current?.blur();
-          }
-        });
-    
-        return () => {
-          keyboardDidHideListener.remove();
-        };
-      }, []);
-
-    return (
-        <View style={styles.inputField}>
-            <Highlight>{label}</Highlight>
-            <TextInput
-                ref={inputRef}
-                keyboardType={keyboardType}
-                value={value}
-                onChangeText={onChangeText}
-                style={[styles.textInput, isFocused && styles.focus]}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-            />
-        </View>
-    );
-}
-
 type NextButtonProps = { disabled?: boolean, onPress: () => void };
 
 const NextButton = ({ disabled, onPress }: NextButtonProps) => (
@@ -119,21 +81,7 @@ const styles = StyleSheet.create({
     },
     fieldSet: {
         gap: 24,
-    },
-    inputField: {
-        gap: 8
-    },
-    textInput: {
-        width: 250,
-        borderWidth: 2,
-        borderColor: Shades.green['10%'],
-        borderRadius: 12,
-        paddingVertical: 2,
-        paddingHorizontal: 12,
-        backgroundColor: Colors.paper
-    },
-    focus: {
-        borderColor: Colors.green
+        width: 250
     },
     footer: {
         width: 250,

@@ -8,11 +8,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "@/app/screens/HomeScreen";
 import OnboardingScreen from "@/app/screens/OnboardingScreen";
+import ProfileScreen from "@/app/screens/ProfileScreen";
 import Header from '@/components/Header';
 import { fonts } from '@/components/StyledText';
 
 import { SearchModeProvider } from '@/context/SearchMode';
 import { LoginProvider, useLogin } from '@/context/Login';
+import { ProfileProvider } from '@/context/Profile';
 
 SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
@@ -27,9 +29,11 @@ const Main = () =>  {
       
     return show && (
         <LoginProvider>
-            <SearchModeProvider>
-                <App />
-            </SearchModeProvider>
+            <ProfileProvider>
+                <SearchModeProvider>
+                    <App />
+                </SearchModeProvider>
+            </ProfileProvider>
         </LoginProvider>
     );
 };
@@ -49,9 +53,10 @@ const App = () => {
     );
 }
 
-const MainNavigation = () => (
+const MainNavigation = () => (<>
     <Stack.Screen name="Home" component={HomeScreen} />
-)
+    <Stack.Screen name="Profile" component={ProfileScreen} />
+</>)
 
 const OnboardingNavigation = () => (
     <Stack.Screen name="Onboarding" component={OnboardingScreen} />
