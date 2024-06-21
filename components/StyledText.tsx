@@ -3,6 +3,7 @@ export { StyledText, Title, SubTitle, Highlight, H2, H3, P, KarlaExtraBold, font
 import { ReactNode } from 'react';
 import { Text, StyleSheet, TextProps, TextStyle } from 'react-native';
 import Colors, { Color } from '@/lib/Colors';
+import { Ionicons } from '@expo/vector-icons';
 
 const fonts = {
     MarkaziText: require('@/assets/fonts/MarkaziText.ttf'),
@@ -10,6 +11,7 @@ const fonts = {
     KarlaMedium: require('@/assets/fonts/Karla-Medium.ttf'),
     KarlaBold: require('@/assets/fonts/Karla-Bold.ttf'),
     KarlaExtraBold: require('@/assets/fonts/Karla-ExtraBold.ttf'),
+    ...Ionicons.font
 };
 
 type FontName = keyof typeof fonts;
