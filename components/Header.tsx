@@ -8,12 +8,35 @@ import Colors from '@/lib/Colors';
 import { useEffect, useRef } from "react";
 import { useSearchMode } from '@/context/SearchMode';
 import SearchBar from "@/components/SearchBar";
+import SwitchView from "@/components/SwitchView";
 import { useUpdateEffect } from "@/hooks/useUpdateEffect";
 
-const Header = ({ back }: { back?: unknown }) => {
-    const { searchMode, query, setQuery, setSearchMode, onSearch } = useSearchMode();
-    const showBack = !!back || !!searchMode;
+const headerHeight = 80;
 
+const Header = ({ back }: { back?: unknown }) => {
+    const searchMode = useSearchMode();
+    
+    return (
+        <SwitchView height={headerHeight} active={searchMode.searchMode ? 1 : 0}>
+            <StackHeader showBackArrow={!!back}/>
+            <SearchModeHeader {...searchMode}/>
+        </SwitchView>
+    )
+};
+
+type StackHeaderProps = { showBackArrow: boolean };
+
+const StackHeader = ({ showBackArrow }: StackHeaderProps) => (
+    <View style={styles.headerView}>
+        <BackArrow show={showBackArrow} onPress={() => {}} />
+        <Image style={styles.logo} source={Logo} />
+        <Avatar name="TD" color="pink"/>
+    </View>
+);
+
+type SearchModeHeaderProps = ReturnType<typeof useSearchMode>;
+
+const SearchModeHeader = ({ query, setQuery, searchMode, setSearchMode, onSearch }: SearchModeHeaderProps) => {
     const inputRef = useRef<TextInput>(null);
 
     useEffect(() => {
@@ -22,25 +45,18 @@ const Header = ({ back }: { back?: unknown }) => {
         }, 20);
     }, [searchMode]);
 
-    useUpdateEffect(() => {
-        onSearch(query)
-    }, [query])
+    useUpdateEffect(() => onSearch(query), [query]);
 
     return (
-        <View style={[styles.headerView, searchMode && { backgroundColor: Colors.green}]}>
-            <BackArrow show={showBack} onPress={() => {setSearchMode(false)}} />
-            {searchMode
-            ? <SearchBar
+        <View style={[styles.headerView, { backgroundColor: Colors.green}]}>
+            <BackArrow show={true} onPress={() => {setSearchMode(false)}} />
+            <SearchBar
                 ref={inputRef}
                 placeholder="Filter by dish name"
                 onChangeText={setQuery}
                 value={query}
                 style={{ flex: 1 }}
             />
-            : <>
-                <Image style={styles.logo} source={Logo} />
-                <Avatar name="TD" color="pink"/>
-            </>}
         </View>
     )
 };
@@ -75,7 +91,7 @@ const Avatar = (props: AvatarProps) => 'name' in props ? (
 const styles = StyleSheet.create({
     headerView: {
         paddingHorizontal: 20,
-        height: 80,
+        height: headerHeight,
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: Colors.paper,
