@@ -1,12 +1,12 @@
 export { ProfileScreen as default };
 
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import MainView from '@/components/MainView';
 import { H4 } from '@/components/StyledText';
 import Avatar from '@/components/Avatar';
 import InputField from '@/components/InputField';
 import { PrimaryButton, SecondaryButton } from '@/components/Button';
-import { ReactNode } from 'react';
+import { ReactNode, useRef } from 'react';
 import { Shades } from '@/lib/Colors';
 import Checkbox from '@/components/Checkbox';
 import * as ImagePicker from 'expo-image-picker';
@@ -22,8 +22,11 @@ const ProfileScreen = () => {
         login.clearAll();
     }
 
+    const viewRef = useRef<ScrollView>(null);
+    const scrollOffset = 300;
+
     return (
-        <MainView style={styles.screen} scrollable>
+        <MainView ref={viewRef} style={styles.screen} scrollable>
             <View>
                 <H4>Avatar</H4>
                 <AvatarPicker firstName={$.firstName} lastName={$.lastName} image={$.image} setImage={$.setImage}/>
@@ -35,21 +38,29 @@ const ProfileScreen = () => {
                     <InputField
                         label="First name"
                         value={$.firstName}
-                        onChangeText={$.setFirstName} />
+                        onChangeText={$.setFirstName}
+                        scrollTo={viewRef}
+                        scrollOffset={scrollOffset} />
                     <InputField
                         label="Last name"
                         value={$.lastName}
-                        onChangeText={$.setLastName} />
+                        onChangeText={$.setLastName}
+                        scrollTo={viewRef}
+                        scrollOffset={scrollOffset} />
                     <InputField
                         label="Email"
                         keyboardType="email-address"
                         value={$.email}
-                        onChangeText={$.setEmail} />
+                        onChangeText={$.setEmail}
+                        scrollTo={viewRef}
+                        scrollOffset={scrollOffset} />
                     <InputField
                         label="Phone number"
                         keyboardType="phone-pad"
                         value={$.phoneNumber}
-                        onChangeText={$.setPhoneNumber} />
+                        onChangeText={$.setPhoneNumber}
+                        scrollTo={viewRef}
+                        scrollOffset={scrollOffset} />
                 </FieldSet>
             </Section>
             <Spacer />
