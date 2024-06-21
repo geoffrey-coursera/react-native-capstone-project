@@ -39,7 +39,7 @@
         "name": "Tea",
         "price": 3.20,
         "description": "Don't mind me, I am a drink.",
-        "image": "lemonDessert.jpg",
+        "image": "tea.jpg",
         "category": "drinks"
       }
     ]
