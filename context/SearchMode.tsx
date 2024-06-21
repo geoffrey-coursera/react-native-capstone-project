@@ -20,14 +20,14 @@ const SearchContext = createContext({
 const useSearchMode = () => {
     const context = useContext(SearchContext);
 
-    const hasReachedTop = useRef(true);
+    const allowExit = useRef(true);
 
     const swipeHandlers = useSwipe({
         up: () => context.setSearchMode('swipe'),
-        down: () => hasReachedTop.current && context.setSearchMode(false)
+        down: () => allowExit.current && context.setSearchMode(false)
     });
 
-    return { ...context, swipeHandlers, hasReachedTop };
+    return { ...context, swipeHandlers, allowExit };
 }
 
 const SearchModeProvider = ({ children }: { children: ReactNode }) => {

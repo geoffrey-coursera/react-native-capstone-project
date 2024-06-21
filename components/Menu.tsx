@@ -5,29 +5,25 @@ import { View, FlatList, StyleSheet, NativeScrollEvent, NativeSyntheticEvent } f
 import { H3, P, StyledText, KarlaExtraBold } from '@/components/StyledText';
 import AutoFitImage from '@/components/AutoFitImage';
 import Colors from '@/lib/Colors';
-import { useRef, MutableRefObject } from 'react';
+import { useRef } from 'react';
+import { useSearchMode } from '@/context/SearchMode';
 
-type MenuProps = {
-    data: MenuItem[],
-    scrollEnabled?: boolean,
-    hasReachedTop: MutableRefObject<boolean>,
-    onOverScroll: () => void
-};
+const Menu = ({ data }: { data: MenuItem[] }) => {
+    const { searchMode, allowExit, setSearchMode } = useSearchMode();
 
-const Menu = ({ data, scrollEnabled=true, hasReachedTop, onOverScroll }: MenuProps) => {
-    const timer = useRef<undefined | NodeJS.Timeout>(undefined);
+    const detectOverScroll = useRef<undefined | NodeJS.Timeout>(undefined);
     
     const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
         const currentScrollPosition = e.nativeEvent.contentOffset.y;
         if(currentScrollPosition > 0) {
-            clearTimeout(timer.current);
+            clearTimeout(detectOverScroll.current);
         }
-        hasReachedTop.current = currentScrollPosition <= 0;
+        allowExit.current = currentScrollPosition <= 0;
     };
 
     const onScrollBeginDrag = () => {
-        if(hasReachedTop.current) {
-            timer.current = setTimeout(() => onOverScroll(), 60);
+        if(allowExit.current) {
+            detectOverScroll.current = setTimeout(() => setSearchMode(false), 60);
         }
     }
 
@@ -37,7 +33,7 @@ const Menu = ({ data, scrollEnabled=true, hasReachedTop, onOverScroll }: MenuPro
             overScrollMode='never'
             onScrollBeginDrag={onScrollBeginDrag}
             onScroll={onScroll}
-            scrollEnabled={scrollEnabled}
+            scrollEnabled={!!searchMode}
             data={data}
             keyExtractor={(item, i) => item.name + i}
             renderItem={({item}) => <MenuItem {...item} />}
