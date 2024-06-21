@@ -17,12 +17,20 @@ const screenHeight = Dimensions.get('window').height - headerHeight;
 const OnboardingScreen = () => {
     const { firstName, setFirstName, email, setEmail, isFormValid, logIn } = useLogin();
     const { spacing, adjustSpacing } = useSpacing();
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+    const onLayout = (keyboardHeight: number) => {
+        adjustSpacing(keyboardHeight)
+        setKeyboardVisible(Boolean(keyboardHeight));
+    };
 
     return (
         <MainView>
-            <KeyboardAwareView onLayout={adjustSpacing} height={screenHeight}>
+            <KeyboardAwareView onLayout={onLayout} height={screenHeight}>
                 <View style={[styles.form, { paddingBottom: spacing }]}>
-                    <H4 style={styles.greeting}>Let us get to know you</H4>
+                    {!keyboardVisible &&
+                        <H4 style={styles.greeting}>Let us get to know you</H4>
+                    }
                     <View style={styles.fieldSet}>
                         <InputField
                             label="First name"
