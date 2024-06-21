@@ -15,6 +15,7 @@ import { fonts } from '@/components/StyledText';
 import { SearchModeProvider } from '@/context/SearchMode';
 import { LoginProvider, useLogin } from '@/context/Login';
 import { ProfileProvider } from '@/context/Profile';
+import { Platform } from 'react-native';
 
 SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
@@ -44,7 +45,9 @@ const App = () => {
     return (
         <NavigationContainer independent={true}>
             <Stack.Navigator initialRouteName="Home" screenOptions={{
-                statusBarStyle: 'dark',
+                // iOS requires a development build to acknowledge UIViewControllerBasedStatusBarAppearance
+                // so I'm dropping it in the context of this assignment.
+                ...(Platform.OS === 'ios' ? {} : {statusBarStyle: 'dark'}),
                 header: Header
             }}>
                 {isLoggedIn ? MainNavigation() : OnboardingNavigation()}
