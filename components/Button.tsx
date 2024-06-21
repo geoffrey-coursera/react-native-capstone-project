@@ -1,31 +1,8 @@
 export { PrimaryButton, SecondaryButton }
 
-import { View, StyleSheet, Pressable, ViewStyle, StyleProp } from 'react-native';
+import { View, StyleSheet, Pressable, ViewStyle, StyleProp, Alert } from 'react-native';
 import {  Highlight } from '@/components/StyledText';
-import { Colors, Shades } from '@/lib/Colors';
-
-type ButtonProps = {
-    disabled?: boolean,
-    onPress: () => void,
-    children: string,
-    style?: StyleProp<ViewStyle>
-};
-
-const PrimaryButton = ({ disabled, onPress, children, style }: ButtonProps) => (
-    <Pressable onPress={onPress} style={style}>
-        <View style={[primary.surface, disabled && primary.disabled]}>
-            <Highlight color={Colors[disabled ? 'text' : 'paper']}>{children}</Highlight>
-        </View>
-    </Pressable>
-);
-
-const SecondaryButton = ({ disabled, onPress, children, style }: ButtonProps) => (
-    <Pressable onPress={onPress} style={style}>
-        <View style={[secondary.surface, disabled && secondary.disabled]}>
-            <Highlight color={Colors.green}>{children}</Highlight>
-        </View>
-    </Pressable>
-);
+import { Colors, Shades, Color } from '@/lib/Colors';
 
 const button = {
     paddingVertical: 12,
@@ -40,10 +17,10 @@ const primary = StyleSheet.create({
         ...button,
         backgroundColor: Colors.green,
         borderColor: Colors.green
-
     },
     disabled: {
-        backgroundColor: Shades.green['10%']
+        backgroundColor: Shades.green['10%'],
+        borderColor: Shades.green['33%']
     },
 });
 
@@ -56,3 +33,61 @@ const secondary = StyleSheet.create({
         opacity: 0.5
     }
 });
+
+type ButtonProps = {
+    children: string,
+    onPress: () => void,
+    disabled?: boolean,
+    disabledReasons?: string[],
+    style?: StyleProp<ViewStyle>
+};
+
+type Styles = {
+    surface: ViewStyle,
+    surfaceDisabled: ViewStyle,
+    color: Color
+    disabledColor?: Color
+};
+
+const Button = ({ surface, surfaceDisabled, disabledColor, color }: Styles) => (
+    ({ children, onPress, disabled, disabledReasons, style }: ButtonProps) => (
+        <Pressable
+            style={style}
+            onPress={() => {
+                if (disabled && disabledReasons)
+                    Alert.alert(...formatMessage(disabledReasons));
+                else if (!disabled) onPress();
+            }}
+        >
+            <View style={[surface, disabled && surfaceDisabled]}>
+                <Highlight color={disabled ? disabledColor : color}>
+                    {children}
+                </Highlight>
+            </View>
+        </Pressable>
+    )
+);
+
+const PrimaryButton = Button({
+    surface: primary.surface,
+    surfaceDisabled: primary.disabled,
+    color: Colors.paper,
+    disabledColor: Colors.text
+});
+
+const SecondaryButton = Button({
+    surface: secondary.surface,
+    surfaceDisabled: secondary.disabled,
+    color: Colors.green,
+});
+
+const formatMessage = (reasons: string[]) => {
+    const errorTitle = `Please address ${
+        reasons.length > 1 ? 'these concerns' : 'this concern'
+    }:`;
+
+    const errorMessage = reasons.length < 2 ? reasons[0]
+        : reasons.map(e => '• ' + e).join('\n');
+    
+    return [errorTitle, errorMessage] as const;
+}

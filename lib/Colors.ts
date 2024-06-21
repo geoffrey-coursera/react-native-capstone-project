@@ -10,6 +10,7 @@ const Colors = {
 
 const Shades = {
     green: {
+        '33%': '#cbd6d3',
         '10%': '#e7ebeb',
         '5%': '#f2f4f3'
     }, text: {
