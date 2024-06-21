@@ -1,4 +1,4 @@
-export { StyledText, Title, SubTitle, Highlight, H3, P, KarlaExtraBold, fonts };
+export { StyledText, Title, SubTitle, Highlight, H2, H3, P, KarlaExtraBold, fonts };
 
 import { ReactNode } from 'react';
 import { Text, StyleSheet, TextProps, TextStyle } from 'react-native';
@@ -63,6 +63,8 @@ const Title = StyledText(styles.title);
 const SubTitle = StyledText(styles.subtitle);
 
 const Highlight = StyledText(styles.highlight);
+
+const H2 = StyledText(styles.h2);
 
 const H3 = StyledText(styles.h3);
 
