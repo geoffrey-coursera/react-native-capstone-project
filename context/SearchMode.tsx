@@ -3,7 +3,7 @@ export { SearchModeProvider, useSearchMode };
 import { useFilter } from "@/hooks/useFilter";
 import { useSwipe } from "@/hooks/useSwipe";
 import { ReactNode, createContext, useContext, useEffect, useRef, useState } from "react";
-import { BackHandler } from "react-native";
+import { BackHandler, Keyboard } from "react-native";
 
 type SearchMode = false | 'swipe' | 'category' | 'searchBar';
 
@@ -14,7 +14,8 @@ const SearchContext = createContext({
     onSelect: (_: string) => {},
     query: '',
     setQuery: (_: string) => {},
-    filters: [] as string[]
+    filters: [] as string[],
+    exitSearchMode: () => {}
 });
 
 const useSearchMode = () => {
@@ -24,7 +25,7 @@ const useSearchMode = () => {
 
     const swipeHandlers = useSwipe({
         up: () => context.setSearchMode('swipe'),
-        down: () => allowExit.current && context.setSearchMode(false)
+        down: () => allowExit.current && context.exitSearchMode()
     });
 
     return { ...context, swipeHandlers, allowExit };
@@ -34,6 +35,11 @@ const SearchModeProvider = ({ children }: { children: ReactNode }) => {
     const [searchMode, setSearchMode] = useState<SearchMode>(false);
     const { onSearch, onSelect, query, setQuery, filters } = useFilter();
 
+    const exitSearchMode = () => {
+        setSearchMode(false);
+        Keyboard.dismiss()
+    }
+    
     const value = {
         searchMode,
         setSearchMode,
@@ -41,6 +47,7 @@ const SearchModeProvider = ({ children }: { children: ReactNode }) => {
         setQuery,
         filters, 
         onSearch,
+        exitSearchMode,
         onSelect: (name: string) => {
             setSearchMode('category');
             onSelect(name);
@@ -50,7 +57,7 @@ const SearchModeProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const handleBackPress = () => {
             if (searchMode) {
-                setSearchMode(false);
+                exitSearchMode()
                 return true;
             }
             return false;

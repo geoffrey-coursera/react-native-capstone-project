@@ -9,7 +9,7 @@ import { useRef } from 'react';
 import { useSearchMode } from '@/context/SearchMode';
 
 const Menu = ({ data }: { data: MenuItem[] }) => {
-    const { searchMode, allowExit, setSearchMode } = useSearchMode();
+    const { searchMode, allowExit, exitSearchMode } = useSearchMode();
 
     const detectOverScroll = useRef<undefined | NodeJS.Timeout>(undefined);
     
@@ -24,7 +24,7 @@ const Menu = ({ data }: { data: MenuItem[] }) => {
 
     const onScrollBeginDrag = () => {
         if(allowExit.current) {
-            detectOverScroll.current = setTimeout(() => setSearchMode(false), 60);
+            detectOverScroll.current = setTimeout(exitSearchMode, 60);
         }
     }
 

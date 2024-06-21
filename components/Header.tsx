@@ -36,7 +36,7 @@ const StackHeader = ({ showBackArrow }: StackHeaderProps) => (
 
 type SearchModeHeaderProps = ReturnType<typeof useSearchMode>;
 
-const SearchModeHeader = ({ query, setQuery, searchMode, setSearchMode, onSearch }: SearchModeHeaderProps) => {
+const SearchModeHeader = ({ query, setQuery, searchMode, exitSearchMode, onSearch }: SearchModeHeaderProps) => {
     const inputRef = useRef<TextInput>(null);
 
     useEffect(() => {
@@ -49,7 +49,7 @@ const SearchModeHeader = ({ query, setQuery, searchMode, setSearchMode, onSearch
 
     return (
         <View style={[styles.headerView, { backgroundColor: Colors.green}]}>
-            <BackArrow show={true} onPress={() => {setSearchMode(false)}} />
+            <BackArrow show={true} onPress={exitSearchMode} />
             <SearchBar
                 ref={inputRef}
                 placeholder="Filter by dish name"
