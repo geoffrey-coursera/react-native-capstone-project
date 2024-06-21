@@ -1,10 +1,9 @@
 export { MainView as default };
 
-import { ReactNode } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, ViewProps } from "react-native";
 
-const MainView = ({ children }: { children: ReactNode }) => (
-    <View style={styles.mainView}>{children}</View>
+const MainView = ({ children, ...props }: ViewProps) => (
+    <View style={styles.mainView} {...props}>{children}</View>
 );
 
 const styles = StyleSheet.create({

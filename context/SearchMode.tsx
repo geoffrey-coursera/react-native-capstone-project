@@ -1,10 +1,11 @@
 export { SearchModeProvider, useSearchMode };
 
 import { useFilter } from "@/hooks/useFilter";
-import { ReactNode, createContext, useContext, useEffect, useState } from "react";
+import { useSwipe } from "@/hooks/useSwipe";
+import { ReactNode, createContext, useContext, useEffect, useRef, useState } from "react";
 import { BackHandler } from "react-native";
 
-type SearchMode = false | 'category' | 'searchBar';
+type SearchMode = false | 'swipe' | 'category' | 'searchBar';
 
 const SearchContext = createContext({
     isSearchMode: false as SearchMode,
@@ -17,7 +18,18 @@ const SearchContext = createContext({
     filters: [] as string[]
 });
 
-const useSearchMode = () => useContext(SearchContext);
+const useSearchMode = () => {
+    const context = useContext(SearchContext);
+
+    const hasReachedTop = useRef(true);
+
+    const swipeHandlers = useSwipe({
+        up: () => context.setIsSearchMode('swipe'),
+        down: () => hasReachedTop.current && context.setIsSearchMode(false)
+    });
+
+    return { ...context, swipeHandlers, hasReachedTop };
+}
 
 const SearchModeProvider = ({ children }: { children: ReactNode }) => {
     const [isSearchMode, setIsSearchMode] = useState<SearchMode>(false);

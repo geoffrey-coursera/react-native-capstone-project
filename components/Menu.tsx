@@ -1,19 +1,50 @@
 export { Menu as default };
 
 import type { MenuItem } from '@/data/menuItems';
-import { View, FlatList, StyleSheet } from 'react-native';
+import { View, FlatList, StyleSheet, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { H3, P, StyledText, KarlaExtraBold } from '@/components/StyledText';
 import AutoFitImage from '@/components/AutoFitImage';
 import Colors from '@/lib/Colors';
+import { useRef, MutableRefObject } from 'react';
 
-const Menu = ({ data }: { data: MenuItem[]}) => (
-    <FlatList
-        data={data}
-        keyExtractor={(item, i) => item.name + i}
-        renderItem={({item}) => <MenuItem {...item} />}
-        ItemSeparatorComponent={() => <Separator />}
-    />
-)
+type MenuProps = {
+    data: MenuItem[],
+    scrollEnabled?: boolean,
+    hasReachedTop: MutableRefObject<boolean>,
+    onOverScroll: () => void
+};
+
+const Menu = ({ data, scrollEnabled=true, hasReachedTop, onOverScroll }: MenuProps) => {
+    const timer = useRef<undefined | NodeJS.Timeout>(undefined);
+    
+    const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+        const currentScrollPosition = e.nativeEvent.contentOffset.y;
+        if(currentScrollPosition > 0) {
+            clearTimeout(timer.current);
+        }
+        hasReachedTop.current = currentScrollPosition <= 0;
+    };
+
+    const onScrollBeginDrag = () => {
+        if(hasReachedTop.current) {
+            timer.current = setTimeout(() => onOverScroll(), 60);
+        }
+    }
+
+    return (
+        <FlatList
+            bounces={false}
+            overScrollMode='never'
+            onScrollBeginDrag={onScrollBeginDrag}
+            onScroll={onScroll}
+            scrollEnabled={scrollEnabled}
+            data={data}
+            keyExtractor={(item, i) => item.name + i}
+            renderItem={({item}) => <MenuItem {...item} />}
+            ItemSeparatorComponent={() => <Separator />}
+        />
+    )
+}
 
 const Separator = () => <View style={styles.separator}></View>
 

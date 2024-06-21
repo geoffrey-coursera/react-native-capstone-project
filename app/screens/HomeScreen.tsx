@@ -1,6 +1,6 @@
 export { HomeScreen as default };
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { View, StyleSheet, Platform  } from 'react-native';
 import MainView from '@/components/MainView';
@@ -29,7 +29,7 @@ const ErrorFilteringData: ErrorMessage = {
 };
 
 const HomeScreen = () => {
-    const { query, filters } = useSearchMode();
+    const { hasReachedTop, query, filters, isSearchMode, swipeHandlers, setIsSearchMode } = useSearchMode();
     const [dataError, setDataError] = useState<ErrorMessage | null>(null);
     const [menuData, setMenuData] = useState<MenuItems.Item[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
@@ -54,14 +54,19 @@ const HomeScreen = () => {
     }, []);
 
     return (
-        <MainView>
+        <MainView {...swipeHandlers}>
             <Hero />
             {dataError ? <ErrorMessage {...dataError} /> : <>
                 <View style={styles.order}>
                     <H2>Order for delivery!</H2>
                     <Categories categories={categories} />
                 </View>
-                <Menu data={menuData} />
+                <Menu
+                    data={menuData}
+                    scrollEnabled={!!isSearchMode}
+                    hasReachedTop={hasReachedTop}
+                    onOverScroll={() => setIsSearchMode(false)}
+                    />
             </>}
         </MainView>
     )
