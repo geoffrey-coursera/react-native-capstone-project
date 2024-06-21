@@ -10,12 +10,12 @@ import { useSearchMode } from '@/context/SearchMode';
 import SearchBar from "@/components/SearchBar";
 import SwitchView from "@/components/SwitchView";
 import { useUpdateEffect } from "@/hooks/useUpdateEffect";
+import { useLogin } from "@/context/Login";
 
 const headerHeight = 80;
 
 const Header = ({ back }: { back?: unknown }) => {
     const searchMode = useSearchMode();
-    
     return (
         <SwitchView height={headerHeight} active={searchMode.searchMode ? 1 : 0}>
             <StackHeader showBackArrow={!!back}/>
@@ -26,13 +26,17 @@ const Header = ({ back }: { back?: unknown }) => {
 
 type StackHeaderProps = { showBackArrow: boolean };
 
-const StackHeader = ({ showBackArrow }: StackHeaderProps) => (
-    <View style={styles.headerView}>
-        <BackArrow show={showBackArrow} onPress={() => {}} />
-        <Image style={styles.logo} source={Logo} />
-        <Avatar name="TD" color="pink"/>
-    </View>
-);
+const StackHeader = ({ showBackArrow }: StackHeaderProps) => {
+    const { isLoggedIn, firstName } = useLogin();
+    
+    return (
+        <View style={styles.headerView}>
+            <BackArrow show={showBackArrow} onPress={() => {}} />
+            <Image style={styles.logo} source={Logo} />
+            <Avatar show={isLoggedIn} name={firstName} color="pink"/>
+        </View>
+    );
+}
 
 type SearchModeHeaderProps = ReturnType<typeof useSearchMode>;
 
@@ -77,16 +81,21 @@ const BackArrow = ({ show, onPress }: BackArrowProps) => (
     
 
 type AvatarProps = PictureAvatar | InitialsAvatar;
-type PictureAvatar = { source: ImageURISource };
-type InitialsAvatar = { name: string, color: ColorValue };
+type PictureAvatar = { show: boolean, source: ImageURISource };
+type InitialsAvatar = { show: boolean, name: string, color: ColorValue };
 
-const Avatar = (props: AvatarProps) => 'name' in props ? (
-    <View style={styles.avatarInitials}>
-        <Text>{props.name}</Text>
-    </View>
-) : (
-    <Image style={styles.avatarPicture} source={props.source}/>
+const Avatar = (props: AvatarProps) => (
+    <View style={[styles.avatarInitials, !props.show && styles.hide]}>{
+        props.show && (
+            'name' in props
+            ? <Text>{formatInitials(props.name)}</Text>
+            : <Image style={styles.avatarPicture} source={props.source}/>
+        )
+    }</View>
 );
+
+const formatInitials = (name: string) =>
+    name[0].toUpperCase() + name.slice(1, 2) || ''
 
 const styles = StyleSheet.create({
     headerView: {
@@ -105,7 +114,7 @@ const styles = StyleSheet.create({
     avatarInitials: {
         height: 50,
         width: 50,
-        backgroundColor: 'pink',
+        backgroundColor: Colors.lemon,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 25,
@@ -124,4 +133,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 25
     },
+    hide: {
+        opacity: 0
+    }
 })

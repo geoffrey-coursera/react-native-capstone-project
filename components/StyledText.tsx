@@ -1,4 +1,4 @@
-export { StyledText, Title, SubTitle, Highlight, H2, H3, P, KarlaExtraBold, fonts };
+export { StyledText, Title, SubTitle, Highlight, H2, H3, H4, P, KarlaExtraBold, fonts };
 
 import { ReactNode } from 'react';
 import { Text, StyleSheet, TextProps, TextStyle } from 'react-native';
@@ -25,6 +25,7 @@ const font = (font: FontName, lineHeightDiff: number) =>
     });
 
 const KarlaMedium = font('KarlaMedium', 3);
+const KarlaBold = font('KarlaBold', 3);
 const KarlaExtraBold = font('KarlaExtraBold', 3);
 const MarkaziText = font('MarkaziText', 0)
 
@@ -44,6 +45,7 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
     },
     h3: KarlaExtraBold(20),
+    h4: KarlaBold(20),
     p: KarlaMedium(16)
 });
 
@@ -69,5 +71,7 @@ const Highlight = StyledText(styles.highlight);
 const H2 = StyledText(styles.h2);
 
 const H3 = StyledText(styles.h3);
+
+const H4 = StyledText(styles.h4);
 
 const P = StyledText(styles.p);
