@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Keyboard, View, ViewProps } from "react-native";
+import { Keyboard, Platform, View, ViewProps } from "react-native";
 
 export { KeyboardAwareView as default };
 
@@ -24,9 +24,12 @@ const KeyboardAwareView = ({ children, style, height, onLayout, ...props }: Keyb
             setKeyboardHeight(0);
             onLayout(0)
         };
+
+        const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+        const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
         
-        const showListener = Keyboard.addListener('keyboardDidShow', onShow);
-        const hideListener = Keyboard.addListener('keyboardDidHide', onHide);
+        const showListener = Keyboard.addListener(showEvent, onShow);
+        const hideListener = Keyboard.addListener(hideEvent, onHide);
         
         return () => {
             showListener.remove();
