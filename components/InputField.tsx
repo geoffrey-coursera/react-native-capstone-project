@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: Shades.green['10%'],
         borderRadius: 12,
-        paddingVertical: 2,
+        paddingVertical: (Platform.OS === 'ios' ? 6 : 0) + 2,
         paddingHorizontal: 12,
         backgroundColor: Colors.paper
     },
