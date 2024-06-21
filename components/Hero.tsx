@@ -28,7 +28,7 @@ const Hero = ({ onSearch }: { onSearch: (a: string) => void}) => {
                 >
                     <SubTitle>Chicago</SubTitle>
                     <Highlight style={styles.heroText} >
-                        We are a family owned Mediterranean restaurant,
+                        We are a family owned Mediterranean restaurant,
                         focused on traditional recipes served with a modern twist.
                     </Highlight>
                 </AutoFitImage>
