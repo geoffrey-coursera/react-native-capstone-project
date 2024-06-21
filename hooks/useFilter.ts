@@ -17,7 +17,7 @@ export const useFilter = () => {
 
     const onSearch = useCallback(debounce((query: string) => {
         setQuery(query)
-    }, 500), []);
+    }, 200), []);
 
     const onSelect = useCallback((name: string) => {
         setFilters(updateFilters(name));
