@@ -4,21 +4,22 @@ import { KarlaExtraBold, StyledText } from '@/components/StyledText';
 import { View, ScrollView, StyleSheet, ViewStyle, Pressable } from 'react-native';
 import { Colors, Shades } from '@/lib/Colors';
 import { useState } from 'react';
+import { useSearchMode } from '@/context/SearchMode';
 
-type OnSelect = { onSelect: (name: string) => void };
 type Categories = { categories: string[] };
 type Name = { name: string };
 
-const Categories = ({ categories, onSelect }: OnSelect & Categories) => (
+const Categories = ({ categories }:  Categories) => (
     <ScrollView horizontal style={styles.scroller}>
         <View style={styles.scrollable}>{categories.map(name => 
-            <Pill key={name} name={name} onSelect={onSelect} />
+            <Pill key={name} name={name} />
         )}</View>
     </ScrollView>
 );
 
-const Pill = ({ name, onSelect }: OnSelect & Name) => {
+const Pill = ({ name }: Name) => {
     const [active, setActive] = useState(false);
+    const { onSelect } = useSearchMode();
     
     return (
         <Pressable onPress={() => {onSelect(name); setActive(a => !a)}}>

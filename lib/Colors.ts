@@ -10,6 +10,8 @@ const Colors = {
 const Shades = {
     green: {
         '10%': '#e7ebeb'
+    }, text: {
+        '66%': '#626769'
     }
 } as const satisfies {
     [K in keyof typeof Colors]?: Record<string, string>

@@ -10,8 +10,11 @@ import HomeScreen from "@/app/screens/HomeScreen";
 import Header from '@/components/Header';
 import { fonts } from '@/components/StyledText';
 
+import { SearchModeProvider } from '@/context/SearchMode';
+
 SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
+
 
 const Main = () =>  {
     const [loaded, error] = useFonts(fonts);
@@ -21,13 +24,15 @@ const Main = () =>  {
     useEffect(() => { show && SplashScreen.hideAsync() }, [loaded]);
       
     return show && (
-        <NavigationContainer independent={true}>
-            <Stack.Navigator initialRouteName="Home" screenOptions={{
-                statusBarStyle: 'dark',
-                header: Header
-            }}>
-                <Stack.Screen name="Home" component={HomeScreen} />
-            </Stack.Navigator>
-        </NavigationContainer>
+        <SearchModeProvider>
+            <NavigationContainer independent={true}>
+                <Stack.Navigator initialRouteName="Home" screenOptions={{
+                    statusBarStyle: 'dark',
+                    header: Header
+                }}>
+                    <Stack.Screen name="Home" component={HomeScreen} />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </SearchModeProvider>
     );
 };

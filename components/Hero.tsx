@@ -1,23 +1,18 @@
 export { Hero as default };
 
-import { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import HeroImage from '@/assets/images/starters-plate.jpg';
 import Colors from '@/lib/Colors';
 import AutoFitImage from '@/components/AutoFitImage';
 import SearchBar from '@/components/SearchBar';
 import { Title, SubTitle, Highlight } from '@/components/StyledText';
+import CollapsibleView from './CollapsibleView';
+import { useSearchMode } from '@/context/SearchMode';
 
-const Hero = ({ onSearch }: { onSearch: (a: string) => void}) => {
-    const [searchBarText, setSearchBarText] = useState('');
-
-    const handleSearchChange = (text: string) => {
-        setSearchBarText(text);
-        onSearch(text);
-    };
-
+const Hero = () =>  {
+    const { searchText, isSearchMode, setIsSearchMode } = useSearchMode();
     return (
-        <View style={styles.heroLayout}>
+        <CollapsibleView style={styles.heroLayout} collapsed={!!isSearchMode}>
             <View>
                 <Title>Little Lemon</Title>
                 <AutoFitImage
@@ -33,14 +28,17 @@ const Hero = ({ onSearch }: { onSearch: (a: string) => void}) => {
                     </Highlight>
                 </AutoFitImage>
             </View>
-            <SearchBar
-                placeholder="Filter by dish name"
-                onChangeText={handleSearchChange}
-                value={searchBarText}
-            />
-        </View>
+            <Pressable onPress={() => {setIsSearchMode('searchBar')}}>
+                <SearchBar
+                    editable={false}
+                    placeholder="Filter by dish name"
+                    value={searchText}
+                />
+            </Pressable>
+        </CollapsibleView>
     );
 }
+
 
 const styles = StyleSheet.create({
     heroLayout: {

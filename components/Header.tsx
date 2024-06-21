@@ -1,30 +1,62 @@
 export { Header as default };
 
-import { NativeStackHeaderProps } from "@react-navigation/native-stack";
-
 import Logo from "@/assets/images/logo.png";
-import { View, Text, Image, StyleSheet, ColorValue } from 'react-native';
+import { View, Text, Image, StyleSheet, Pressable, TextInput } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '@/lib/Colors';
 
-const Header = ({ back }: NativeStackHeaderProps) => (
-    <View style={styles.headerView}>
-        <BackArrow show={!!back} />
-        <Image style={styles.logo} source={Logo} />
-        <Avatar name="TD" color="pink"/>
-    </View>
-);
+import { useEffect, useRef } from "react";
+import { useSearchMode } from '@/context/SearchMode';
+import SearchBar from "@/components/SearchBar";
+import { useUpdateEffect } from "@/hooks/useUpdateEffect";
 
-type BackArrowProps = { show: boolean }
+const Header = ({ back }: { back?: unknown }) => {
+    const { isSearchMode, searchText, setSearchText, setIsSearchMode, onSearch } = useSearchMode();
+    const showBack = !!back || !!isSearchMode;
 
-const BackArrow = ({ show }: BackArrowProps) => (
-    <View style={[styles.backArrowView, { opacity: show ? 1 : 0 }]}>
-        <Ionicons
-            name="chevron-back"
-            size={28}
-            color="#495E57"
-            style={{marginRight: 3}} />
-    </View>
+    const inputRef = useRef<TextInput>(null);
+
+    useEffect(() => {
+        if(isSearchMode === 'searchBar') setTimeout(() => {
+            inputRef.current?.focus();
+        }, 20);
+    }, [isSearchMode]);
+
+    useUpdateEffect(() => {
+        onSearch(searchText)
+    }, [searchText])
+
+    return (
+        <View style={[styles.headerView, isSearchMode && { backgroundColor: Colors.green}]}>
+            <BackArrow show={showBack} onPress={() => {setIsSearchMode(false)}} />
+            {isSearchMode
+            ? <SearchBar
+                ref={inputRef}
+                placeholder="Filter by dish name"
+                onChangeText={setSearchText}
+                value={searchText}
+                style={{ flex: 1 }}
+            />
+            : <>
+                <Image style={styles.logo} source={Logo} />
+                <Avatar name="TD" color="pink"/>
+            </>}
+        </View>
+    )
+};
+
+type BackArrowProps = { show: boolean, onPress: () => void }
+
+const BackArrow = ({ show, onPress }: BackArrowProps) => (
+    <Pressable onPress={onPress}>
+        <View style={[styles.backArrowView, { opacity: show ? 1 : 0 }]}>
+            <Ionicons
+                name="chevron-back"
+                size={28}
+                color="#495E57"
+                style={{marginRight: 3}} />
+        </View>
+    </Pressable>
 );
     
 
@@ -42,10 +74,12 @@ const Avatar = (props: AvatarProps) => 'name' in props ? (
 
 const styles = StyleSheet.create({
     headerView: {
-        marginHorizontal: 20,
+        paddingHorizontal: 20,
         height: 80,
         flexDirection: 'row',
         alignItems: 'center',
+        backgroundColor: Colors.paper,
+        gap: 12
     },
     logo: {
         height: 40,

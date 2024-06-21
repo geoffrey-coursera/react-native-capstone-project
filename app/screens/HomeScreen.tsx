@@ -10,11 +10,13 @@ import { H2 } from '@/components/StyledText';
 import Categories from '@/components/Categories';
 
 import * as MenuItems from '@/data/menuItems';
-import { useFilter } from '@/hooks/useFilter';
 import { rejectIf, isEmpty } from '@/lib/functional';
 
 import { Shades } from '@/lib/Colors';
 import ErrorMessage from '@/components/ErrorMessage';
+
+import { useSearchMode } from '@/context/SearchMode';
+import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 
 const ErrorGettingData: ErrorMessage = {
     title: 'We could not bring you the menu.',
@@ -27,16 +29,18 @@ const ErrorFilteringData: ErrorMessage = {
 };
 
 const HomeScreen = () => {
+    const { query, filters } = useSearchMode();
     const [dataError, setDataError] = useState<ErrorMessage | null>(null);
     const [menuData, setMenuData] = useState<MenuItems.Item[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
-    const { onSearch, onSelect } = useFilter((query, filters) => {
+
+    useUpdateEffect(() => {
         MenuItems.filter(query, filters)
             .then(setMenuData, e => {
                 console.error(e);
                 setDataError(ErrorFilteringData)
             })
-    });
+    }, [query, filters]);
 
     useEffect(() => {
         getData(MenuItems.query, MenuItems.fetch, MenuItems.save)
@@ -51,13 +55,11 @@ const HomeScreen = () => {
 
     return (
         <MainView>
-            <Hero onSearch={onSearch} />
+            <Hero />
             {dataError ? <ErrorMessage {...dataError} /> : <>
                 <View style={styles.order}>
                     <H2>Order for delivery!</H2>
-                    <Categories
-                        categories={categories}
-                        onSelect={onSelect} />
+                    <Categories categories={categories} />
                 </View>
                 <Menu data={menuData} />
             </>}

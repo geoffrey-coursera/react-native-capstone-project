@@ -1,6 +1,6 @@
 import debounce from "lodash.debounce";
 import { useCallback, useState } from "react";
-import { useUpdateEffect } from "@/hooks/useUpdateEffect";
+
 
 const updateFilters = (name: string) => (filters: string[]) => {
     const index = filters.indexOf(name);
@@ -11,7 +11,7 @@ const updateFilters = (name: string) => (filters: string[]) => {
 }
 
 
-export const useFilter = (onFilter: (query: string, filters: string[]) => void) => {
+export const useFilter = () => {
     const [query, setQuery] = useState<string>('');
     const [filters, setFilters] = useState<string[]>([]);
 
@@ -23,9 +23,5 @@ export const useFilter = (onFilter: (query: string, filters: string[]) => void) 
         setFilters(updateFilters(name));
     }, [filters]);
 
-    useUpdateEffect(() => {
-        onFilter(query, filters)
-    }, [query, filters]);
-
-    return { onSearch, onSelect }
+    return { onSearch, onSelect, query, filters }
 }
