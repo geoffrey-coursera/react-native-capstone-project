@@ -1,14 +1,14 @@
-declare module '@/assets/*.jpg' {
+declare module '@/assets/images/*.jpg' {
     const Src: ImageURISource;
     export default Src
 }
 
-declare module '@/assets/*.jpeg' {
+declare module '@/assets/images/*.jpeg' {
     const Src: ImageURISource;
     export default Src
 }
 
-declare module '@/assets/*.png' {
+declare module '@/assets/images/*.png' {
     const Src: ImageURISource;
     export default Src
 }
