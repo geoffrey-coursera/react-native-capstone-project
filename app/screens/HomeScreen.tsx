@@ -1,72 +1,61 @@
 export { HomeScreen as default };
 
-import { useCallback, useEffect, useState } from 'react';
-import { useUpdateEffect } from '@/hooks.ts/useUpdateEffect';
+import { useEffect, useState } from 'react';
+
+import { View, StyleSheet } from 'react-native';
 import MainView from '@/components/MainView';
-import debounce from 'lodash.debounce';
 import Hero from '@/components/Hero';
-import Menu, { MenuItem } from '@/components/Menu';
+import Menu from '@/components/Menu';
 import { H2 } from '@/components/StyledText';
 import Categories from '@/components/Categories';
-import { createTable, filterMenuItems, getMenuItems, saveMenuItems,  } from '@/lib/database';
+
+import * as MenuItems from '@/data/menuItems';
+import { useFilter } from '@/hooks/useFilter';
 import { effect, rejectIf, isEmpty } from '@/lib/functional';
-import { View, StyleSheet } from 'react-native';
+
 import { Shades } from '@/lib/Colors';
 
-const fetchMenuItems = () =>
-    fetch('https://github.com/geoffrey-coursera/react-native-capstone-project/blob/main/public/capstone.json?raw=true')
-    .then(r => r.json())
-    .then(effect(() => console.log('fetching')))
-    .then(({ menu }) => menu);
-
-const getCategories = (data: MenuItem[]): string[] =>
-    Array.from(new Set(data.map(({ category }) => category)));
-
 const HomeScreen = () => {
-    const [menuData, setMenuData] = useState<MenuItem[]>([]);
-    const [query, setQuery] = useState<string>('');
+    const [menuData, setMenuData] = useState<MenuItems.Item[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
-    const [filters, setFilters] = useState<string[]>([]);
+    const { onSearch, onSelect } = useFilter((query, filters) => {
+        MenuItems.filter(query, filters).then(setMenuData)
+    });
 
     useEffect(() => {
-        createTable()
-            .then(getMenuItems)
-            .catch(() => [])
-            .then(rejectIf(isEmpty))
-            .catch(() => fetchMenuItems().then(effect(saveMenuItems)))
-            .then(data => {
-                setMenuData(data);
-                setCategories(getCategories(data));
-            })
-            .catch(console.error);
-    }, []);
-
-    useUpdateEffect(() => {
-        filterMenuItems(query, filters).then(setMenuData)
-    }, [query, filters]);
-
-    const updateQuery = useCallback(debounce((query: string) => {
-        setQuery(query)
-    }, 500), []);
-
-    const updateFilters = useCallback((filters: string[]) => {
-        setFilters(filters);
+        getData(MenuItems.query, MenuItems.fetch, MenuItems.save).then(data => {
+            setMenuData(data);
+            setCategories(extractCategories(data));
+        });
     }, []);
 
     return (
         <MainView>
-            <Hero onSearch={updateQuery} />
+            <Hero onSearch={onSearch} />
             <View style={styles.order}>
                 <H2>Order for delivery!</H2>
                 <Categories
                     categories={categories}
-                    filters={filters}
-                    onSelect={updateFilters} />
+                    onSelect={onSelect} />
             </View>
             <Menu data={menuData} />
         </MainView>
     )
 };
+
+const extractCategories = (data: MenuItems.Item[]): string[] =>
+    Array.from(new Set(data.map(({ category }) => category)));
+
+const getData = <R,>(
+    queryData: () => Promise<MenuItems.Item[]>,
+    fetchData: () => Promise<MenuItems.Item[]>,
+    saveData: (data: MenuItems.Item[]) => Promise<R>
+) => MenuItems.createTable()
+    .then(queryData)
+    .catch(() => [])
+    .then(rejectIf(isEmpty))
+    .catch(() => fetchData().then(effect(saveData)))
+    .catch(effect(console.error));
 
 const styles = StyleSheet.create({
     order: {

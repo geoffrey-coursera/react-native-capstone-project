@@ -1,7 +1,7 @@
-export { Menu as default, MenuItem };
+export { Menu as default };
 
-import type { MenuItem } from '@/lib/database';
-import { View, FlatList, StyleSheet, Dimensions } from 'react-native';
+import type { MenuItem } from '@/data/menuItems';
+import { View, FlatList, StyleSheet } from 'react-native';
 import { H3, P, StyledText, KarlaExtraBold } from '@/components/StyledText';
 import AutoFitImage from '@/components/AutoFitImage';
 import Colors from '@/lib/Colors';

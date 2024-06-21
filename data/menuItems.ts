@@ -1,11 +1,24 @@
-export { createTable, saveMenuItems, getMenuItems, filterMenuItems };
-export type { MenuItem };
+export {
+    createTable,
+    dropTable,
+    fetchMenuItems as fetch,
+    saveMenuItems as save,
+    queryMenuItems as query,
+    filterMenuItems as filter,
+};
 
-import * as SQLite from 'expo-sqlite';
+export type { MenuItem, MenuItem as Item };
+
 import { Filter, reduceFilters } from '@/lib/Filter';
 import * as sql from '@/lib/sql';
+import db from '@/data/database';
+import { effect } from '@/lib/functional';
 
-const db = SQLite.openDatabaseSync('little_lemon');
+const fetchMenuItems = () =>
+    fetch('https://github.com/geoffrey-coursera/react-native-capstone-project/blob/main/public/capstone.json?raw=true')
+    .then(r => r.json())
+    .then(effect(() => console.log('fetching')))
+    .then(({ menu }) => menu);
 
 const schema = {
     id: 'integer primary key autoincrement',
@@ -23,6 +36,10 @@ type MenuItem = {
 
 const columns = Object.keys(schema) as Array<keyof typeof schema>;
 
+const dropTable = () => db.runAsync(
+    `drop table menuitems;`
+);
+
 const createTable = () => db.runAsync(
     `create table if not exists menuitems (${
         Object.entries(schema)
@@ -31,7 +48,7 @@ const createTable = () => db.runAsync(
     });`
 );
 
-const getMenuItems = (): Promise<MenuItem[]> =>
+const queryMenuItems = (): Promise<MenuItem[]> =>
     db.getAllAsync(`select * from menuitems`);
 
 const filterMenuItems = (
@@ -56,7 +73,7 @@ const filterMenuItems = (
     return db.getAllAsync(`select * from menuitems ${where}`, params)
 };
 
-const saveMenuItems = (menuItems: MenuItem[]): Promise<SQLite.SQLiteRunResult> => {
+const saveMenuItems = (menuItems: MenuItem[]) => {
     const keys = sql.Tuple(columns);
 
     const placeholder = sql.PlaceholderTuple(columns.length);
