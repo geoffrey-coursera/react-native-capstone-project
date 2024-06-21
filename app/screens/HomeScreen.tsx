@@ -1,26 +1,40 @@
 export { HomeScreen as default };
 
-import { useCallback, useState } from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
 import MainView from '@/components/MainView';
 import debounce from 'lodash.debounce';
 import Hero from '@/components/Hero';
+import Menu, { MenuItem } from '@/components/Menu';
+import { createTable, getMenuItems, saveMenuItems,  } from '@/lib/database';
+import { effect, rejectIf, isEmpty } from '@/lib/functional';
+
+const fetchMenuItems = () =>
+    fetch('https://github.com/geoffrey-coursera/react-native-capstone-project/blob/main/public/capstone.json?raw=true')
+    .then(r => r.json())
+    .then(effect(() => console.log('fetching')))
+    .then(({ menu }) => menu);
 
 const HomeScreen = () => {
-    const [query, setQuery] = useState('');
+    const [menuData, setMenuData] = useState<MenuItem[]>([]);
 
-    
-    const updateQuery = useCallback(debounce((q: string) => setQuery(q), 500), []);
+    useEffect(() => {
+        createTable()
+            .then(() => getMenuItems())
+            .catch(() => [])
+            .then(rejectIf(isEmpty))
+            .catch(() => fetchMenuItems().then(effect(saveMenuItems)))
+            .then(effect(setMenuData))
+            .catch(console.error);
+    }, []);
+
+    const updateQuery = useCallback(debounce((query: string) => {
+        getMenuItems(query, []).then(setMenuData)
+    }, 500), []);
 
     return (
         <MainView>
             <Hero onSearch={updateQuery} />
-            <Text>{query}</Text>
+            <Menu data={menuData} />
         </MainView>
     )
 };
-
-
-const styles = StyleSheet.create({
-
-})

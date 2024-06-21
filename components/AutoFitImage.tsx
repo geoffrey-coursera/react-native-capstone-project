@@ -1,13 +1,15 @@
 export { AutoFitImage as default };
 
 import { ReactNode, useState } from 'react';
-import { View, Image } from 'react-native';
-import type { LayoutChangeEvent, ImageSourcePropType, ImageStyle, ImageResizeMode } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
+import type { LayoutChangeEvent, ImageSourcePropType, ImageStyle, ImageResizeMode, ViewStyle } from 'react-native';
 
 type AutoFitImageProps = {
     position: 'left' | 'right'
     source: ImageSourcePropType,
     gap?: number,
+    wrapperStyle?: ViewStyle
+    contentStyle?: ViewStyle
     imageStyle: ImageStyle,
     resizeMode?: ImageResizeMode,
     children: ReactNode,
@@ -16,10 +18,12 @@ type AutoFitImageProps = {
 const AutoFitImage = ({
     position,
     source,
-    gap=0,
+    gap,
+    wrapperStyle,
+    contentStyle,
     imageStyle={},
     resizeMode='cover',
-    children
+    children,
 }: AutoFitImageProps) => {
     const [height, setHeight] = useState(0);
 
@@ -28,13 +32,13 @@ const AutoFitImage = ({
     };
 
     const content = (
-        <View style={{ flexShrink: 1 }} onLayout={measureHeight}>
+        <View style={[styles.content, contentStyle]} onLayout={measureHeight}>
             {children}
         </View>
     );
 
     return(
-        <View style={{ flexDirection: 'row', gap }}>
+        <View style={[styles.wrapper, wrapperStyle, gap !== undefined && {gap}]}>
             {position === 'right' && content}
             <Image
                 source={source}
@@ -45,3 +49,12 @@ const AutoFitImage = ({
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    wrapper: {
+        flexDirection: 'row'
+    },
+    content: {
+        flexShrink: 1
+    }
+});

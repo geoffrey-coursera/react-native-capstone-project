@@ -1,4 +1,4 @@
-export { Title, SubTitle, Highlight };
+export { Title, SubTitle, Highlight, H3, P };
 
 import { ReactNode } from 'react';
 import { Text, StyleSheet, TextProps, TextStyle } from 'react-native';
@@ -10,6 +10,8 @@ type StyleTextProps = Omit<TextProps, 'style'> & {
     color?: Color,
     numberOfLines?: number
 };
+
+const styledText = { fontFamily: 'Karla', color: Colors.text };
 
 const styles = StyleSheet.create({
     title: {
@@ -26,9 +28,20 @@ const styles = StyleSheet.create({
         color: Colors.paper
     },
     highlight: {
-        fontFamily: 'Karla',
+        ...styledText,
         fontSize: 18,
         lineHeight: 20,
+    },
+    h3: {
+        ...styledText,
+        fontSize: 21,
+        lineHeight: 26,
+        fontWeight: 'bold'
+    },
+    p: {
+        ...styledText,
+        fontSize: 17,
+        lineHeight: 19,
     }
 });
 
@@ -45,3 +58,6 @@ const SubTitle = StyledText(styles.subtitle);
 
 const Highlight = StyledText(styles.highlight);
 
+const H3 = StyledText(styles.h3);
+
+const P = StyledText(styles.p);
