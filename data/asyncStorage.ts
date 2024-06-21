@@ -1,8 +1,9 @@
-export { getEntries, save };
+export { getEntries, save, hasChanged };
 
 import { ToEntry } from '@/lib/types';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+type KeyOf<C> = (keyof C) & string;
 type Entry = [string, string];
 type State = Record<string, string | number | boolean>;
 
@@ -27,3 +28,12 @@ const parse = <S extends State>(initState: S, key: keyof S, value: string | null
         default: return value;
     }
 }
+
+const hasChanged = <S extends State>(state: S) => <K extends KeyOf<S>>(entries: [K, S[K]][]) =>
+    entries.map(([key, value]) => ({ key: key, state: state[key], store: value }))
+    .filter(({ state, store }) => state !== store)
+    .map(({key, state, store }) => [
+        `${key}:`,
+        `    current value: "${state}"`,
+        `    saved value: ${store ? `"${store}"`: '(no value)'}`
+    ].join('\n'))

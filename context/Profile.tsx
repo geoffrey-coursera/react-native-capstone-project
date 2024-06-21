@@ -2,6 +2,7 @@ export { ProfileProvider, useProfile }
 
 import ErrorBubble from "@/components/ErrorBubble";
 import { P } from "@/components/StyledText";
+import { hasChanged } from "@/data/asyncStorage";
 import { initState, State, getProfileEntries, saveProfile } from "@/data/profile";
 import Colors from "@/lib/Colors";
 import { loadStateFromObject, loadStateFromGetter } from "@/lib/react";
@@ -20,7 +21,8 @@ const init = {
     errors: [] as string[],
     phoneErrorRenderer: () => null as ReactNode,
     clearAll: () => {},
-    loadStateFromStorage: () => Promise.resolve()
+    loadStateFromStorage: () => Promise.resolve(),
+    profileHasChanged: () => Promise.resolve([] as string[])
 };
 
 const ProfileContext = createContext({...init, save: () => {}});
@@ -62,6 +64,11 @@ const ProfileProvider = ({ children }: { children: ReactNode }) => {
         image,
     } satisfies State;
 
+    const profileHasChanged = useCallback(
+        () => getProfileEntries().then(hasChanged(state)),
+        [state]
+    );
+
     const context = {
         ...state,
         setLastName,
@@ -75,7 +82,8 @@ const ProfileProvider = ({ children }: { children: ReactNode }) => {
         setImage,
         errors,
         clearAll,
-        loadStateFromStorage
+        loadStateFromStorage,
+        profileHasChanged
     };
 
     const save = () => saveProfile(state);

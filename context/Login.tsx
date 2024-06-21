@@ -2,6 +2,7 @@ export { LoginProvider, useLogin }
 
 import ErrorBubble from "@/components/ErrorBubble";
 import { P } from "@/components/StyledText";
+import { hasChanged } from "@/data/asyncStorage";
 import { initState, State, getLoginEntries, saveLogin } from "@/data/login";
 import Colors from "@/lib/Colors";
 import { loadStateFromGetter, loadStateFromObject } from "@/lib/react";
@@ -19,7 +20,8 @@ const init = {
     logIn: () => {},
     clearAll: () => {},
     isStorageLoaded: false,
-    loadStateFromStorage: () => Promise.resolve()
+    loadStateFromStorage: () => Promise.resolve(),
+    loginHasChanged: () => Promise.resolve([] as string[])
 };
 
 const LoginContext = createContext({...init, save: () => {}});
@@ -61,6 +63,11 @@ const LoginProvider = ({ children }: { children: ReactNode }) => {
 
     const state = { isLoggedIn, firstName, email } satisfies State;
 
+    const loginHasChanged = useCallback(
+        () => getLoginEntries().then(hasChanged(state)),
+        [state]
+    );
+    
     const context = {
         ...state,
         setIsLoggedIn,
@@ -73,7 +80,8 @@ const LoginProvider = ({ children }: { children: ReactNode }) => {
         logIn,
         clearAll,
         isStorageLoaded,
-        loadStateFromStorage
+        loadStateFromStorage,
+        loginHasChanged
     };
     
     const save = () => { saveLogin(state); }

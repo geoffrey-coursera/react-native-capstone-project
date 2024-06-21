@@ -1,7 +1,7 @@
 export { Header as default };
 
 import Logo from "@/assets/images/logo.png";
-import { View, Image, StyleSheet, Pressable, TextInput } from 'react-native';
+import { View, Image, StyleSheet, Pressable, TextInput, Alert, BackHandler } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '@/lib/Colors';
 
@@ -52,13 +52,39 @@ const HomeHeader = () => {
     );
 };
 
-const SubScreenHeader = ({ title }: { title: string }) => (
-    <View style={[styles.headerView, styles.subScreen]}>
-        <BackArrow show={true} onPress={useNavigation().goBack} />
-        <HeaderText style={styles.title} noDescenders>{title}</HeaderText>
-        <Placeholder />
-    </View>
-);
+const SubScreenHeader = ({ title }: { title: string }) => {
+    const { profileHasChanged } = useProfile();
+    const { loginHasChanged } = useLogin();
+    const { goBack } = useNavigation();
+
+    const backPress = async () => {
+        const changesLists = await Promise.all([loginHasChanged(), profileHasChanged()]);
+        const changes = changesLists.flat().join('\n\n');
+        if(changes) Alert.alert(
+            'Pending changes',
+            `You need to save or discard these changes before leaving this page:\n\n${changes}`
+        );
+        else goBack();
+    };
+    
+    useEffect(() => {
+        const handler = () => { backPress(); return true };
+
+        BackHandler.addEventListener('hardwareBackPress', handler);
+
+        return () => {
+            BackHandler.removeEventListener('hardwareBackPress', handler);
+        }
+    }, [backPress]);
+    
+    return (
+        <View style={[styles.headerView, styles.subScreen]}>
+            <BackArrow show={true} onPress={backPress} />
+            <HeaderText style={styles.title} noDescenders>{title}</HeaderText>
+            <Placeholder />
+        </View>
+    );
+}
 
 type SearchModeHeaderProps = ReturnType<typeof useSearchMode>;
 
