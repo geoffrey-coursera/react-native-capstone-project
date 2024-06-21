@@ -12,7 +12,7 @@ const MainView = forwardRef<ScrollView, MainViewProps>((props, ref) => {
     const innerStyle = scrollable ? styles.mainView : [styles.mainView, style];
     return (
         scrollable
-        ? <ScrollView ref={ref} style={innerStyle}>
+        ? <ScrollView ref={ref} style={innerStyle} keyboardShouldPersistTaps="handled">
             <MainView {...props} scrollable={false} />
           </ScrollView>
         : <View style={innerStyle} {...rest}>{children}</View>

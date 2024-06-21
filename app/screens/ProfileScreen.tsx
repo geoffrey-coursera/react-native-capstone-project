@@ -1,6 +1,6 @@
 export { ProfileScreen as default };
 
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Keyboard } from 'react-native';
 import MainView from '@/components/MainView';
 import { H4 } from '@/components/StyledText';
 import Avatar from '@/components/Avatar';
@@ -24,6 +24,7 @@ const ProfileScreen = () => {
     }
 
     const saveAll = () => {
+        Keyboard.dismiss();
         $.save();
         login.save();
         Alert.alert(
@@ -33,6 +34,7 @@ const ProfileScreen = () => {
     };
 
     const discardChanges = () => {
+        Keyboard.dismiss();
         Promise.all([
             $.loadStateFromStorage(),
             login.loadStateFromStorage()

@@ -10,7 +10,7 @@ type Categories = { categories: string[] };
 type Name = { name: string };
 
 const Categories = ({ categories }:  Categories) => (
-    <ScrollView horizontal style={styles.scroller}>
+    <ScrollView horizontal style={styles.scroller} keyboardShouldPersistTaps="handled">
         <View style={styles.scrollable}>{categories.map(name => 
             <Pill key={name} name={name} />
         )}</View>
