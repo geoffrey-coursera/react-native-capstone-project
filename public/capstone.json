@@ -34,7 +34,14 @@
         "description": "You can't go wrong with this delicious lemon dessert!",
         "image": "lemonDessert.jpg",
         "category": "desserts"      
+      },
+      {
+        "name": "Tea",
+        "price": 3.20,
+        "description": "Don't mind me, I am a drink.",
+        "image": "lemonDessert.jpg",
+        "category": "drinks"
       }
     ]
-  }
+}
   
