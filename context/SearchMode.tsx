@@ -8,13 +8,12 @@ import { BackHandler } from "react-native";
 type SearchMode = false | 'swipe' | 'category' | 'searchBar';
 
 const SearchContext = createContext({
-    isSearchMode: false as SearchMode,
-    setIsSearchMode: (_: SearchMode) => {},
-    searchText: '',
-    setSearchText: (_: string) => {},
+    searchMode: false as SearchMode,
+    setSearchMode: (_: SearchMode) => {},
     onSearch: (_: string) => {},
     onSelect: (_: string) => {},
     query: '',
+    setQuery: (_: string) => {},
     filters: [] as string[]
 });
 
@@ -24,36 +23,34 @@ const useSearchMode = () => {
     const hasReachedTop = useRef(true);
 
     const swipeHandlers = useSwipe({
-        up: () => context.setIsSearchMode('swipe'),
-        down: () => hasReachedTop.current && context.setIsSearchMode(false)
+        up: () => context.setSearchMode('swipe'),
+        down: () => hasReachedTop.current && context.setSearchMode(false)
     });
 
     return { ...context, swipeHandlers, hasReachedTop };
 }
 
 const SearchModeProvider = ({ children }: { children: ReactNode }) => {
-    const [isSearchMode, setIsSearchMode] = useState<SearchMode>(false);
-    const [searchText, setSearchText] = useState('');
-    const { onSearch, onSelect, query, filters } = useFilter();
+    const [searchMode, setSearchMode] = useState<SearchMode>(false);
+    const { onSearch, onSelect, query, setQuery, filters } = useFilter();
 
     const value = {
-        isSearchMode,
-        setIsSearchMode,
-        searchText,
-        setSearchText,
+        searchMode,
+        setSearchMode,
         query,
+        setQuery,
         filters, 
         onSearch,
         onSelect: (name: string) => {
-            setIsSearchMode('category');
+            setSearchMode('category');
             onSelect(name);
         }
     };
 
     useEffect(() => {
         const handleBackPress = () => {
-            if (isSearchMode) {
-                setIsSearchMode(false);
+            if (searchMode) {
+                setSearchMode(false);
                 return true;
             }
             return false;
@@ -64,7 +61,7 @@ const SearchModeProvider = ({ children }: { children: ReactNode }) => {
         return () => {
             BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
         };
-    }, [isSearchMode]);
+    }, [searchMode]);
   
     return (
         <SearchContext.Provider value={value}>

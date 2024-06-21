@@ -11,30 +11,30 @@ import SearchBar from "@/components/SearchBar";
 import { useUpdateEffect } from "@/hooks/useUpdateEffect";
 
 const Header = ({ back }: { back?: unknown }) => {
-    const { isSearchMode, searchText, setSearchText, setIsSearchMode, onSearch } = useSearchMode();
-    const showBack = !!back || !!isSearchMode;
+    const { searchMode, query, setQuery, setSearchMode, onSearch } = useSearchMode();
+    const showBack = !!back || !!searchMode;
 
     const inputRef = useRef<TextInput>(null);
 
     useEffect(() => {
-        if(isSearchMode === 'searchBar') setTimeout(() => {
+        if(searchMode === 'searchBar') setTimeout(() => {
             inputRef.current?.focus();
         }, 20);
-    }, [isSearchMode]);
+    }, [searchMode]);
 
     useUpdateEffect(() => {
-        onSearch(searchText)
-    }, [searchText])
+        onSearch(query)
+    }, [query])
 
     return (
-        <View style={[styles.headerView, isSearchMode && { backgroundColor: Colors.green}]}>
-            <BackArrow show={showBack} onPress={() => {setIsSearchMode(false)}} />
-            {isSearchMode
+        <View style={[styles.headerView, searchMode && { backgroundColor: Colors.green}]}>
+            <BackArrow show={showBack} onPress={() => {setSearchMode(false)}} />
+            {searchMode
             ? <SearchBar
                 ref={inputRef}
                 placeholder="Filter by dish name"
-                onChangeText={setSearchText}
-                value={searchText}
+                onChangeText={setQuery}
+                value={query}
                 style={{ flex: 1 }}
             />
             : <>

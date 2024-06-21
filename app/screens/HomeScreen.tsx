@@ -29,7 +29,7 @@ const ErrorFilteringData: ErrorMessage = {
 };
 
 const HomeScreen = () => {
-    const { hasReachedTop, query, filters, isSearchMode, swipeHandlers, setIsSearchMode } = useSearchMode();
+    const { hasReachedTop, query, filters, searchMode, swipeHandlers, setSearchMode } = useSearchMode();
     const [dataError, setDataError] = useState<ErrorMessage | null>(null);
     const [menuData, setMenuData] = useState<MenuItems.Item[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
@@ -63,9 +63,9 @@ const HomeScreen = () => {
                 </View>
                 <Menu
                     data={menuData}
-                    scrollEnabled={!!isSearchMode}
+                    scrollEnabled={!!searchMode}
                     hasReachedTop={hasReachedTop}
-                    onOverScroll={() => setIsSearchMode(false)}
+                    onOverScroll={() => setSearchMode(false)}
                     />
             </>}
         </MainView>

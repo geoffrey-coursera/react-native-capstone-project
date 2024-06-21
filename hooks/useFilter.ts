@@ -23,5 +23,5 @@ export const useFilter = () => {
         setFilters(updateFilters(name));
     }, [filters]);
 
-    return { onSearch, onSelect, query, filters }
+    return { onSearch, onSelect, query, setQuery, filters }
 }

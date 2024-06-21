@@ -10,9 +10,9 @@ import CollapsibleView from './CollapsibleView';
 import { useSearchMode } from '@/context/SearchMode';
 
 const Hero = () =>  {
-    const { searchText, isSearchMode, setIsSearchMode } = useSearchMode();
+    const { query, searchMode, setSearchMode } = useSearchMode();
     return (
-        <CollapsibleView style={styles.heroLayout} collapsed={!!isSearchMode}>
+        <CollapsibleView style={styles.heroLayout} collapsed={!!searchMode}>
             <View>
                 <Title>Little Lemon</Title>
                 <AutoFitImage
@@ -28,11 +28,11 @@ const Hero = () =>  {
                     </Highlight>
                 </AutoFitImage>
             </View>
-            <Pressable onPress={() => {setIsSearchMode('searchBar')}}>
+            <Pressable onPress={() => {setSearchMode('searchBar')}}>
                 <SearchBar
                     editable={false}
                     placeholder="Filter by dish name"
-                    value={searchText}
+                    value={query}
                 />
             </Pressable>
         </CollapsibleView>
