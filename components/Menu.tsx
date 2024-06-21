@@ -29,7 +29,7 @@ const MenuItem = ({ name, description, price, image }: MenuItem) => (
         <View style={styles.menuItemText}>
             <H3>{name}</H3>
             <P color={Colors.green} numberOfLines={2}>{description}</P>
-            <Price color={Colors.green}>${price}</Price>
+            <Price color={Colors.green}>${price.toFixed(2)}</Price>
         </View>
         </AutoFitImage>
     </View>
