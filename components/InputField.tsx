@@ -1,11 +1,13 @@
 export { InputField as default };
 
-import { View, StyleSheet, TextInput, KeyboardType, Keyboard, TextStyle, StyleProp, ScrollView, LayoutChangeEvent, Platform } from 'react-native';
+import { View, StyleSheet, TextInput, KeyboardType, Keyboard, TextStyle, StyleProp, ScrollView, LayoutChangeEvent, Platform, Animated } from 'react-native';
 import { Highlight, P } from '@/components/StyledText';
 import { Colors, Shades } from '@/lib/Colors';
 import { Ionicons } from '@expo/vector-icons';
 
 import { ReactNode, RefObject, useEffect, useRef, useState } from 'react';
+import RenderOffScreen from './RenderOffScreen';
+import { useUpdateEffect } from '@/hooks/useUpdateEffect';
 
 type InputFieldProps = {
     required?: boolean,
@@ -70,6 +72,8 @@ const InputField = ({
         };
     }, []);
 
+    const {computeHeight, dynamicHeight} = useAnimateHeight(showError);
+
     return (
         <View style={styles.inputField} onLayout={updatePosY}>
             <View style={styles.label}>
@@ -100,10 +104,21 @@ const InputField = ({
                     });
                 }}
             />
-            {showError && errorMessage?.()}
+            {errorMessage &&
+            <>
+                <Animated.View style={[styles.errorAnimatedWrapper, { height: dynamicHeight }]}>
+                    <View style={styles.errorInnerWrapper}>
+                    {errorMessage?.()}
+                    </View>
+                </Animated.View>
+                <RenderOffScreen render={errorMessage} onLayout={computeHeight} />
+            </>
+            }
         </View>
     );
 };
+
+const verticalGap = 8;
 
 const icon = {
     fontSize: 18,
@@ -111,7 +126,14 @@ const icon = {
 
 const styles = StyleSheet.create({
     inputField: {
-        gap: 8,
+        gap: verticalGap,
+    },
+    errorAnimatedWrapper: {
+        overflow: 'hidden',
+        marginTop: -verticalGap,
+    },
+    errorInnerWrapper: {
+        paddingTop: verticalGap
     },
     label: {
         flexDirection: 'row',
@@ -138,3 +160,22 @@ const styles = StyleSheet.create({
         color: Colors.error
     }
 });
+
+const useAnimateHeight = (showError: boolean) => {
+    const [errorHeight, setErrorHeight] = useState(0);
+    const dynamicHeight = useRef(new Animated.Value(0)).current;
+
+    const toggleError = (show: boolean) => Animated.timing(dynamicHeight, {
+        toValue: show ? errorHeight + verticalGap : 0,
+        duration: 200,
+        useNativeDriver: false
+    }).start();
+
+    const computeHeight = (e: LayoutChangeEvent) => {
+        setErrorHeight(Math.round(e.nativeEvent.layout.height));
+    };
+
+    useUpdateEffect(() => toggleError(showError), [showError]);
+
+    return { computeHeight, dynamicHeight }
+}
