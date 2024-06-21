@@ -1,7 +1,7 @@
 export { Menu as default };
 
 import type { MenuItem } from '@/data/menuItems';
-import { View, FlatList, StyleSheet, NativeScrollEvent, NativeSyntheticEvent, Keyboard } from 'react-native';
+import { View, FlatList, StyleSheet, NativeScrollEvent, NativeSyntheticEvent, Keyboard, GestureResponderEvent } from 'react-native';
 import { H3, P, StyledText, KarlaExtraBold } from '@/components/StyledText';
 import AutoFitImage from '@/components/AutoFitImage';
 import Colors from '@/lib/Colors';
@@ -9,30 +9,27 @@ import { useRef } from 'react';
 import { useSearchMode } from '@/context/SearchMode';
 
 const Menu = ({ data }: { data: MenuItem[] }) => {
-    const { searchMode, allowExit, exitSearchMode } = useSearchMode();
+    const { searchMode, exitSearchMode } = useSearchMode();
 
-    const detectOverScroll = useRef<undefined | NodeJS.Timeout>(undefined);
+    const startY = useRef(0);
+    const startReached = useRef(true);
     
     const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-        Keyboard.dismiss()
-        const currentScrollPosition = e.nativeEvent.contentOffset.y;
-        if(currentScrollPosition > 0) {
-            clearTimeout(detectOverScroll.current);
-        }
-        allowExit.current = currentScrollPosition <= 0;
+        Keyboard.dismiss();
+        startReached.current = e.nativeEvent.contentOffset.y <= 0;
     };
-
-    const onScrollBeginDrag = () => {
-        if(allowExit.current) {
-            detectOverScroll.current = setTimeout(exitSearchMode, 60);
-        }
-    }
 
     return (
         <FlatList
+            onTouchMove={({nativeEvent}: GestureResponderEvent) => {
+                const scrollUpAttempt = nativeEvent.pageY - startY.current > 0;
+                if (startReached.current && scrollUpAttempt) exitSearchMode();
+            }}
+            onTouchStart={({nativeEvent}: GestureResponderEvent) => {
+                startY.current = nativeEvent.pageY;
+            }}
             bounces={false}
             overScrollMode='never'
-            onScrollBeginDrag={onScrollBeginDrag}
             onScroll={onScroll}
             scrollEnabled={!!searchMode}
             data={data}

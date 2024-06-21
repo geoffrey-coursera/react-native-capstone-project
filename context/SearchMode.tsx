@@ -3,7 +3,7 @@ export { SearchModeProvider, useSearchMode };
 import { useFilter } from "@/hooks/useFilter";
 import { useSwipe } from "@/hooks/useSwipe";
 import { ReactNode, createContext, useContext, useEffect, useRef, useState } from "react";
-import { BackHandler, Keyboard } from "react-native";
+import { BackHandler, GestureResponderHandlers, Keyboard } from "react-native";
 
 type SearchMode = false | 'swipe' | 'category' | 'searchBar';
 
@@ -15,25 +15,29 @@ const SearchContext = createContext({
     query: '',
     setQuery: (_: string) => {},
     filters: [] as string[],
-    exitSearchMode: () => {}
+    exitSearchMode: () => {},
+    swipeHandlers: {} as GestureResponderHandlers
 });
 
-const useSearchMode = () => {
-    const context = useContext(SearchContext);
-
-    const allowExit = useRef(true);
-
-    const swipeHandlers = useSwipe({
-        up: () => context.setSearchMode('swipe'),
-        down: () => allowExit.current && context.exitSearchMode()
-    });
-
-    return { ...context, swipeHandlers, allowExit };
-}
+const useSearchMode = () => useContext(SearchContext);
 
 const SearchModeProvider = ({ children }: { children: ReactNode }) => {
     const [searchMode, setSearchMode] = useState<SearchMode>(false);
     const { onSearch, onSelect, query, setQuery, filters } = useFilter();
+
+    const imperativeSearchMode = useRef<SearchMode>(false);
+
+    useEffect(() => {
+        imperativeSearchMode.current = searchMode;
+    }, [searchMode]);
+
+    const swipeHandlers = useSwipe({
+        shouldIntercept: ({ dx, dy }) => (
+            imperativeSearchMode.current === false
+            && Math.abs(dx) < Math.abs(dy)
+        ),
+        up: () => setSearchMode('swipe'),
+    });
 
     const exitSearchMode = () => {
         setSearchMode(false);
@@ -48,6 +52,7 @@ const SearchModeProvider = ({ children }: { children: ReactNode }) => {
         filters, 
         onSearch,
         exitSearchMode,
+        swipeHandlers,
         onSelect: (name: string) => {
             setSearchMode('category');
             onSelect(name);

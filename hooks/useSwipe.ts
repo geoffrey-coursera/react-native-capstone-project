@@ -1,19 +1,17 @@
 import { useRef } from 'react';
-import { PanResponder } from 'react-native';
+import { PanResponder, PanResponderGestureState } from 'react-native';
 
-type Callbacks = { up: () => void, down: () => void };
+type Callbacks = {
+    shouldIntercept: (gestureState: PanResponderGestureState) => boolean
+    up: () => void,
+};
 
-export const useSwipe = ({ up, down }: Callbacks, distance=50) => {
+export const useSwipe = ({ up, shouldIntercept }: Callbacks, distance=50) => {
     const swipeUpHandlers = useRef(
         PanResponder.create({
-            onMoveShouldSetPanResponder: (_, gestureState) =>
-                Math.abs(gestureState.dx) < Math.abs(gestureState.dy),
+            onMoveShouldSetPanResponder: (_, state) => shouldIntercept(state),
             onPanResponderMove: (_, gestureState) => {
-                if (gestureState.dy < -1 * distance) {
-                    up();
-                } else if (gestureState.dy > 1 * distance) {
-                    down();
-                }
+                if (gestureState.dy < -1 * distance) up();
             }
         })
     ).current.panHandlers;
