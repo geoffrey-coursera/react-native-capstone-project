@@ -14,6 +14,7 @@ type InputFieldProps = {
     placeholder?: string,
     isValid?: boolean,
     errorMessage?: () => ReactNode,
+    inlineErrorMessage?: string,
     keyboardType?: KeyboardType
     onChangeText: (a: string) => void,
     inputStyle?: StyleProp<TextStyle>,
@@ -28,6 +29,7 @@ const InputField = ({
     placeholder,
     isValid=required ? value.length > 0 : undefined,
     errorMessage,
+    inlineErrorMessage,
     onChangeText,
     keyboardType='default',
     inputStyle,
@@ -48,6 +50,8 @@ const InputField = ({
     );
     const showRequiredError = required && wasTouched && value === '';
 
+    const showInlineError = showError && inlineErrorMessage && value !== '';
+    
     const showRequired = required && !showCheckMark && !showError;
 
     useEffect(() => {
@@ -76,6 +80,7 @@ const InputField = ({
                 {showError && <>
                     <Ionicons name="close-circle-sharp" style={[styles.cross]} />
                     {showRequiredError && <P color={Colors.error}>required</P>}
+                    {showInlineError && <P color={Colors.error}>{inlineErrorMessage}</P>}
                 </>}
             </View>
             <TextInput
@@ -83,7 +88,7 @@ const InputField = ({
                 keyboardType={keyboardType}
                 value={value}
                 placeholder={placeholder}
-                placeholderTextColor={Shades.text['66%']}
+                placeholderTextColor={Shades.green['33%']}
                 onChangeText={onChangeText}
                 style={[styles.textInput, inputStyle, isFocused && styles.focus]}
                 onBlur={() => setIsFocused(false)}

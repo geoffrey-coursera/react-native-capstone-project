@@ -40,9 +40,9 @@ const OnboardingScreen = () => {
                             onChangeText={$.setFirstName} />
                         <InputField
                             required
-                            label="email"
+                            label="Email"
                             isValid={$.isEmailValid}
-                            errorMessage={$.emailErrorRenderer}
+                            inlineErrorMessage="invalid email address"
                             keyboardType="email-address"
                             value={$.email}
                             onChangeText={$.setEmail} />
