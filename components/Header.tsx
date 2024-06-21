@@ -5,6 +5,7 @@ import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import Logo from "@/assets/logo.png";
 import { View, Text, Image, StyleSheet, ColorValue } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import Colors from '@/lib/Colors';
 
 const Header = ({ back }: NativeStackHeaderProps) => (
     <View style={styles.headerView}>
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
     backArrowView: {
         height: 40,
         width: 40,
-        backgroundColor: '#F4CE14',
+        backgroundColor: Colors.lemon,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 25
