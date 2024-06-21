@@ -1,14 +1,19 @@
 export { InputField as default };
 
-import { View, StyleSheet, TextInput, KeyboardType, Keyboard, TextStyle, StyleProp, ScrollView, LayoutChangeEvent } from 'react-native';
-import { Highlight } from '@/components/StyledText';
+import { View, StyleSheet, TextInput, KeyboardType, Keyboard, TextStyle, StyleProp, ScrollView, LayoutChangeEvent, Platform } from 'react-native';
+import { Highlight, P } from '@/components/StyledText';
 import { Colors, Shades } from '@/lib/Colors';
+import { Ionicons } from '@expo/vector-icons';
 
-import { RefObject, useEffect, useRef, useState } from 'react';
+import { ReactNode, RefObject, useEffect, useRef, useState } from 'react';
 
 type InputFieldProps = {
+    required?: boolean,
     label: string,
     value: string,
+    placeholder?: string,
+    isValid?: boolean,
+    errorMessage?: () => ReactNode,
     keyboardType?: KeyboardType
     onChangeText: (a: string) => void,
     inputStyle?: StyleProp<TextStyle>,
@@ -17,8 +22,12 @@ type InputFieldProps = {
 };
 
 const InputField = ({
+    required,
     label,
     value,
+    placeholder,
+    isValid=required ? value.length > 0 : undefined,
+    errorMessage,
     onChangeText,
     keyboardType='default',
     inputStyle,
@@ -26,9 +35,24 @@ const InputField = ({
     scrollOffset=0
 }: InputFieldProps) => {
     const [isFocused, setIsFocused] = useState(false);
+    const [wasTouched, setWasTouched] = useState(false);
+
     const inputRef = useRef<TextInput>(null);
     const [posY, setPosY] = useState(0);
     const updatePosY = (e: LayoutChangeEvent) => setPosY(e.nativeEvent.layout.y);
+
+    const showCheckMark = isValid && value;
+    const showError = (
+        isValid !== undefined && !isValid
+        && wasTouched && (required || value !== '')
+    );
+    const showRequiredError = required && wasTouched && value === '';
+
+    const showRequired = required && !showCheckMark && !showError;
+
+    useEffect(() => {
+        if (value) setWasTouched(true)
+    }, [value, wasTouched])
 
     useEffect(() => {
         const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
@@ -44,11 +68,22 @@ const InputField = ({
 
     return (
         <View style={styles.inputField} onLayout={updatePosY}>
-            <Highlight>{label}</Highlight>
+            <View style={styles.label}>
+                <Highlight>{label}{showRequired ? '*' : ''}</Highlight>
+                {showCheckMark &&
+                    <Ionicons name="checkmark-circle-sharp" style={[styles.checkMark]} />
+                }
+                {showError && <>
+                    <Ionicons name="close-circle-sharp" style={[styles.cross]} />
+                    {showRequiredError && <P color={Colors.error}>required</P>}
+                </>}
+            </View>
             <TextInput
                 ref={inputRef}
                 keyboardType={keyboardType}
                 value={value}
+                placeholder={placeholder}
+                placeholderTextColor={Shades.text['66%']}
                 onChangeText={onChangeText}
                 style={[styles.textInput, inputStyle, isFocused && styles.focus]}
                 onBlur={() => setIsFocused(false)}
@@ -60,13 +95,23 @@ const InputField = ({
                     });
                 }}
             />
+            {showError && errorMessage?.()}
         </View>
     );
 };
 
+const icon = {
+    fontSize: 18,
+} satisfies TextStyle;
+
 const styles = StyleSheet.create({
     inputField: {
-        gap: 8
+        gap: 8,
+    },
+    label: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6
     },
     textInput: {
         borderWidth: 2,
@@ -78,5 +123,13 @@ const styles = StyleSheet.create({
     },
     focus: {
         borderColor: Colors.green
+    },
+    checkMark: {
+        ...icon,
+        color: Colors.green
+    },
+    cross: {
+        ...icon,
+        color: Colors.error
     }
 });

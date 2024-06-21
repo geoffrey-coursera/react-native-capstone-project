@@ -15,7 +15,7 @@ const headerHeight = 80;
 const screenHeight = Dimensions.get('window').height - headerHeight;
 
 const OnboardingScreen = () => {
-    const { firstName, setFirstName, email, setEmail, isFormValid, logIn } = useLogin();
+    const $ = useLogin();
     const { spacing, adjustSpacing } = useSpacing();
     const [keyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -33,18 +33,22 @@ const OnboardingScreen = () => {
                     }
                     <View style={styles.fieldSet}>
                         <InputField
+                            required
                             label="First name"
-                            value={firstName}
-                            onChangeText={setFirstName} />
+                            value={$.firstName}
+                            onChangeText={$.setFirstName} />
                         <InputField
+                            required
                             label="email"
+                            isValid={$.isEmailValid}
+                            errorMessage={$.emailErrorRenderer}
                             keyboardType="email-address"
-                            value={email}
-                            onChangeText={setEmail} />
+                            value={$.email}
+                            onChangeText={$.setEmail} />
                     </View>
                 </View>
                 <View style={styles.footer}>
-                    <NextButton disabled={!isFormValid} onPress={logIn}/>
+                    <NextButton disabled={!$.isFormValid} onPress={$.logIn}/>
                 </View>
             </KeyboardAwareView>
         </MainView>

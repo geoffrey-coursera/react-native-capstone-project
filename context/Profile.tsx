@@ -1,6 +1,9 @@
 export { ProfileProvider, useProfile }
 
+import ErrorBubble from "@/components/ErrorBubble";
+import { P } from "@/components/StyledText";
 import { useLogin } from "@/context/Login";
+import Colors from "@/lib/Colors";
 import { ReactNode, createContext, useContext, useState } from "react";
 
 const noop = (..._: any[]) => {}
@@ -20,6 +23,8 @@ const ProfileContext = createContext({
     setSpecialOffer: noop,
     setNewsLetter: noop,
     setImage: noop,
+    isPhoneNumberValid: false,
+    phoneErrorRenderer: () => null as ReactNode,
     clearAll: noop,
 });
 
@@ -38,6 +43,8 @@ const ProfileProvider = ({ children }: { children: ReactNode }) => {
     const [specialOffer, setSpecialOffer] = useState(true);
     const [newsletter, setNewsLetter] = useState(true);
     const [image, setImage] = useState('');
+    const isPhoneNumberValid = checkPhoneNumber(phoneNumber);
+
     const clearAll = () => {
         setLastName('');
         setPhoneNumber('');
@@ -50,7 +57,7 @@ const ProfileProvider = ({ children }: { children: ReactNode }) => {
 
     const value = {
         lastName, setLastName,
-        phoneNumber, setPhoneNumber,
+        phoneNumber, setPhoneNumber, isPhoneNumberValid, phoneErrorRenderer,
         orderStatus, setOrderStatus,
         passwordChange, setPasswordChange,
         specialOffer, setSpecialOffer,
@@ -65,3 +72,31 @@ const ProfileProvider = ({ children }: { children: ReactNode }) => {
         </ProfileContext.Provider>
     );
 }
+
+const checkPhoneNumber = (phone: string): boolean => {
+    const normalised = normalisePhoneNumber(phone);
+    return normalised.match(phoneReg) !== null;
+}
+
+const normalisePhoneNumber = (phone: string) =>
+    phone.replace(leadingZeros, '')
+        .replace(optionalZeroNotation, '')
+        .replace(/\D/g, '');
+
+
+const leadingZeros = /^00/;
+const optionalZeroNotation = '(0)'
+const countryCode = '[1-9]{1}[0-9]{0,2}';
+const areaCode = '[2-9]{1}[0-9]{2}';
+const telPrefix = '[0-9]{3}';
+const lineNumber = '[0-9]{4}';
+
+const phoneReg = new RegExp(`^${countryCode}${areaCode}${telPrefix}${lineNumber}$`);
+
+const phoneErrorRenderer = () => (
+    <ErrorBubble>
+        <P color={Colors.error}>We expect an international phone number with a country code, followed by 10 digits.</P>
+        <P color={Colors.error}>You can format it any way you like.</P>
+        <P color={Colors.error}>If you live in the United States, your country code is 1.</P>
+    </ErrorBubble>
+);

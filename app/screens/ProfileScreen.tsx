@@ -6,12 +6,13 @@ import { H4 } from '@/components/StyledText';
 import Avatar from '@/components/Avatar';
 import InputField from '@/components/InputField';
 import { PrimaryButton, SecondaryButton } from '@/components/Button';
-import { ReactNode, useRef } from 'react';
+import { useRef } from 'react';
 import { Shades } from '@/lib/Colors';
 import Checkbox from '@/components/Checkbox';
 import * as ImagePicker from 'expo-image-picker';
 import { useProfile } from '@/context/Profile';
 import { useLogin } from '@/context/Login';
+import CustomView from '@/components/CustomView';
 
 const ProfileScreen = () => {
     const $ = useProfile();
@@ -36,6 +37,7 @@ const ProfileScreen = () => {
                 <H4>Contact information</H4>
                 <FieldSet>
                     <InputField
+                        required
                         label="First name"
                         value={$.firstName}
                         onChangeText={$.setFirstName}
@@ -43,13 +45,17 @@ const ProfileScreen = () => {
                         scrollOffset={scrollOffset} />
                     <InputField
                         label="Last name"
+                        isValid={$.lastName.length > 0}
                         value={$.lastName}
                         onChangeText={$.setLastName}
                         scrollTo={viewRef}
                         scrollOffset={scrollOffset} />
                     <InputField
+                        required
                         label="Email"
                         keyboardType="email-address"
+                        isValid={login.isEmailValid}
+                        errorMessage={login.emailErrorRenderer}
                         value={$.email}
                         onChangeText={$.setEmail}
                         scrollTo={viewRef}
@@ -57,6 +63,9 @@ const ProfileScreen = () => {
                     <InputField
                         label="Phone number"
                         keyboardType="phone-pad"
+                        isValid={$.isPhoneNumberValid}
+                        errorMessage={$.phoneErrorRenderer}
+                        placeholder="+123-456-789-1234"
                         value={$.phoneNumber}
                         onChangeText={$.setPhoneNumber}
                         scrollTo={viewRef}
@@ -110,20 +119,6 @@ const AvatarPicker = ({ firstName, lastName, image, setImage }: AvatarPickerProp
     );
 }
 
-const Spacer = () => <View style={styles.spacer} />
-
-const Section = ({ children }: { children: ReactNode }) => (
-    <View style={styles.section}>{children}</View>
-);
-
-const FieldSet = ({ children }: { children: ReactNode }) => (
-    <View style={styles.fieldSet}>{children}</View>
-);
-
-const Row = ({ children }: { children: ReactNode }) => (
-    <View style={styles.row}>{children}</View>
-)
-
 const styles = StyleSheet.create({
     screen: {
         gap: 32,
@@ -146,4 +141,12 @@ const styles = StyleSheet.create({
         borderColor: Shades.green['10%'],
         borderBottomWidth: 1
     }
-})
+});
+
+const Spacer = CustomView(styles.spacer);
+
+const Section = CustomView(styles.section);
+
+const FieldSet = CustomView(styles.fieldSet);
+
+const Row = CustomView(styles.row);

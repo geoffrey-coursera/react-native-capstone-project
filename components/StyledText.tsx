@@ -1,6 +1,5 @@
 export { StyledText, Title, SubTitle, Highlight, H2, H3, H4, P, KarlaExtraBold, MarkaziText, fonts };
 
-import { ReactNode } from 'react';
 import { Text, StyleSheet, TextProps, TextStyle, StyleProp } from 'react-native';
 import Colors, { Color } from '@/lib/Colors';
 import { Ionicons } from '@expo/vector-icons';
