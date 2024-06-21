@@ -8,15 +8,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "@/app/screens/HomeScreen";
 import Header from '@/components/Header';
+import { fonts } from '@/components/StyledText';
 
 SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
 
 const Main = () =>  {
-    const [loaded, error] = useFonts({
-        MarkaziText: require('@/assets/fonts/MarkaziText.ttf'),
-        Karla: require('@/assets/fonts/Karla.ttf'),
-    });
+    const [loaded, error] = useFonts(fonts);
 
     const show = loaded || error;
 

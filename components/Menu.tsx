@@ -2,7 +2,7 @@ export { Menu as default, MenuItem };
 
 import type { MenuItem } from '@/lib/database';
 import { View, FlatList, StyleSheet, Dimensions } from 'react-native';
-import { H3, P } from '@/components/StyledText';
+import { H3, P, StyledText, KarlaExtraBold } from '@/components/StyledText';
 import AutoFitImage from '@/components/AutoFitImage';
 import Colors from '@/lib/Colors';
 
@@ -29,7 +29,7 @@ const MenuItem = ({ name, description, price, image }: MenuItem) => (
         <View style={styles.menuItemText}>
             <H3>{name}</H3>
             <P color={Colors.green} numberOfLines={2}>{description}</P>
-            <H3 color={Colors.green}>${price}</H3>
+            <Price color={Colors.green}>${price}</Price>
         </View>
         </AutoFitImage>
     </View>
@@ -56,4 +56,6 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         opacity: 0.1
     }
-})
+});
+
+const Price = StyledText(KarlaExtraBold(19));
