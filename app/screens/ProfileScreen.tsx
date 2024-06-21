@@ -23,6 +23,9 @@ const ProfileScreen = () => {
         login.clearAll();
     }
 
+    const errors = [...login.errors, ...$.errors];
+    const isFormValid = errors.length === 0;
+
     const viewRef = useRef<ScrollView>(null);
     const scrollOffset = 300;
 
@@ -84,7 +87,13 @@ const ProfileScreen = () => {
             </Section>
             <Spacer />
             <Row>
-                <PrimaryButton onPress={() => {}}>Save changes</PrimaryButton>
+                <PrimaryButton
+                    disabledReasons={errors}
+                    disabled={!isFormValid}
+                    onPress={$.saveProfile}
+                >
+                    Save changes
+                </PrimaryButton>
                 <SecondaryButton style={{flex: 1}} onPress={() => {}}>Discard changes</SecondaryButton>
             </Row>
             <Spacer />

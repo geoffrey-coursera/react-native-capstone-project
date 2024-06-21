@@ -13,6 +13,7 @@ const LoginContext = createContext({
     isLoggedIn: true,
     setFirstName: (_: string) => {},
     setEmail: (_: string) => {},
+    errors: [] as string[],
     emailErrorRenderer: () => null as ReactNode,
     logIn: () => {},
     clearAll: () => {}
@@ -27,7 +28,17 @@ const LoginProvider = ({ children }: { children: ReactNode }) => {
     const isFormFilled = Boolean(firstName && email);
     const isEmailValid = checkEmail(email);
     const isFormValid = isFormFilled && isEmailValid;
+
+    const errors = [
+        !firstName && 'missing required first name',
+        (
+            !email ? 'missing email address'
+            : !isEmailValid && 'incorrect email address'
+        )
+    ].filter(Boolean) as string[]
+
     const logIn = () => setIsLoggedIn(isFormValid);
+
     const clearAll = () => {
         setFirstName('');
         setEmail('');
@@ -43,6 +54,7 @@ const LoginProvider = ({ children }: { children: ReactNode }) => {
         isLoggedIn,
         setFirstName,
         setEmail,
+        errors,
         logIn,
         clearAll
     };

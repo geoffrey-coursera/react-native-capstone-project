@@ -1,14 +1,15 @@
 export { OnboardingScreen as default };
 
-import { View, StyleSheet, Dimensions, Pressable } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import MainView from '@/components/MainView';
-import { H4, Highlight } from '@/components/StyledText';
+import { H4 } from '@/components/StyledText';
 import KeyboardAwareView from '@/components/KeyboardAwareView';
 import { Colors, Shades } from '@/lib/Colors';
 
 import { useLogin } from '@/context/Login';
 import { useState } from 'react';
 import InputField from '@/components/InputField';
+import { PrimaryButton } from '@/components/Button';
 
 // I use a static height to ensure it isn't resized by the keyboard on Android
 const headerHeight = 80;
@@ -48,7 +49,14 @@ const OnboardingScreen = () => {
                     </View>
                 </View>
                 <View style={styles.footer}>
-                    <NextButton disabled={!$.isFormValid} onPress={$.logIn}/>
+                    <PrimaryButton
+                        style={styles.button}
+                        disabledReasons={$.errors}
+                        disabled={!$.isFormValid}
+                        onPress={$.logIn}
+                    >
+                        Next
+                    </PrimaryButton>
                 </View>
             </KeyboardAwareView>
         </MainView>
@@ -68,16 +76,6 @@ const useSpacing = () => {
 const calcSpacing = (screenHeight: number, keyboardHeight: number) =>
     3.5 * (screenHeight - keyboardHeight) ** 3 / 10**7
 
-
-type NextButtonProps = { disabled?: boolean, onPress: () => void };
-
-const NextButton = ({ disabled, onPress }: NextButtonProps) => (
-    <Pressable onPress={onPress}>
-        <View style={[styles.button, disabled && styles.buttonInactive]}>
-            <Highlight color={Colors[disabled ? 'text' : 'paper']}>Next</Highlight>
-        </View>
-    </Pressable>
-);
 
 const styles = StyleSheet.create({
     form: {
@@ -103,15 +101,5 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginBottom: 12
     },
-    button: {
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        alignItems: 'center',
-        minWidth: 100,
-        borderRadius: 12,
-        backgroundColor: Colors.green
-    }, 
-    buttonInactive: {
-        backgroundColor: Shades.green['10%']
-    }
+    button: { minWidth: 100 }, 
 });

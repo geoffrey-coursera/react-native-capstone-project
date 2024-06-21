@@ -24,6 +24,7 @@ const ProfileContext = createContext({
     setNewsLetter: noop,
     setImage: noop,
     isPhoneNumberValid: false,
+    errors: [] as string[],
     phoneErrorRenderer: () => null as ReactNode,
     clearAll: noop,
 });
@@ -32,7 +33,8 @@ const ProfileContext = createContext({
 const useProfile = () => {
     const context = useContext(ProfileContext);
     const { firstName, setFirstName, email, setEmail } = useLogin();
-    return { ...context, firstName, setFirstName, email, setEmail };
+    const saveProfile = () => {};
+    return { ...context, firstName, setFirstName, email, setEmail, saveProfile };
 };
     
 const ProfileProvider = ({ children }: { children: ReactNode }) => {
@@ -44,6 +46,10 @@ const ProfileProvider = ({ children }: { children: ReactNode }) => {
     const [newsletter, setNewsLetter] = useState(true);
     const [image, setImage] = useState('');
     const isPhoneNumberValid = checkPhoneNumber(phoneNumber);
+
+    const errors = [
+        !(isPhoneNumberValid || phoneNumber === '') && 'incorrect phone number'
+    ].filter(Boolean) as string[];
 
     const clearAll = () => {
         setLastName('');
@@ -63,6 +69,7 @@ const ProfileProvider = ({ children }: { children: ReactNode }) => {
         specialOffer, setSpecialOffer,
         newsletter, setNewsLetter,
         image, setImage,
+        errors,
         clearAll
     };
 
